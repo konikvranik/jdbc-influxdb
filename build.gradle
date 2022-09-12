@@ -1,0 +1,7 @@
+plugins {
+	id 'java-library'
+	id 'io.freefair.lombok' version '6.5.1'
+}
+dependencies {
+	implementation "org.influxdb:influxdb-java:2.22"
+}

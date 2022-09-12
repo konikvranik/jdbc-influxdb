@@ -1,0 +1,4 @@
+module InfluxDbSqlDriver {
+	requires java.sql;
+	provides java.sql.Driver with net.suteren.jdbc.influxdb.InfluxDbDriver;
+}

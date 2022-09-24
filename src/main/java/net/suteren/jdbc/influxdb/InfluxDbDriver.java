@@ -18,25 +18,27 @@ public class InfluxDbDriver implements java.sql.Driver {
 			url = m.group(1);
 			String username = null;
 			String password = null;
+			String database = null;
 			if (info != null) {
 				username = info.getProperty("username");
 				if (username == null) {
 					username = info.getProperty("user");
 				}
 				password = info.getProperty("password");
+				database = info.getProperty("database");
 			}
 			return new InfluxDbConnection(url.matches("^https?://.*$") ? url : "http://" + url,
-				username, password, this);
+				username, password, database, this);
 		} else {
 			throw new java.sql.SQLException(String.format("Invalid URL %s", url));
 		}
 	}
 
-	@Override public boolean acceptsURL(String url) throws SQLException {
+	@Override public boolean acceptsURL(String url) {
 		return url != null && url.startsWith("jdbc:inbluxdb:");
 	}
 
-	@Override public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
+	@Override public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) {
 		return new DriverPropertyInfo[0];
 	}
 

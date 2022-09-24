@@ -16,6 +16,7 @@ import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
+import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Statement;
@@ -30,9 +31,9 @@ import java.util.function.Function;
 import org.influxdb.dto.QueryResult;
 
 public class InfluxDbResultSet implements ResultSet {
-	private final QueryResult.Result result;
-	private final AtomicInteger resultPosition = new AtomicInteger(0);
-	private final AtomicInteger seriesPosition = new AtomicInteger(-1);
+	final QueryResult.Result result;
+	final AtomicInteger valuesPosition = new AtomicInteger(-1);
+	final AtomicInteger seriesPosition = new AtomicInteger(0);
 	private final InfluxDbStatement statement;
 	private boolean isClosed = false;
 	private String cursorName;
@@ -43,8 +44,9 @@ public class InfluxDbResultSet implements ResultSet {
 	}
 
 	@Override public boolean next() {
-		if (resultPosition.intValue() < result.getSeries().size()) {
-			resultPosition.addAndGet(1);
+		List<QueryResult.Series> series = result.getSeries();
+		if (series != null && seriesPosition.intValue() < series.size()) {
+			seriesPosition.addAndGet(1);
 			return true;
 		} else {
 			return false;
@@ -52,7 +54,7 @@ public class InfluxDbResultSet implements ResultSet {
 	}
 
 	@Override public void close() {
-		resultPosition.set(0);
+		seriesPosition.set(0);
 		isClosed = true;
 	}
 
@@ -128,72 +130,72 @@ public class InfluxDbResultSet implements ResultSet {
 			x -> new ByteArrayInputStream(String.valueOf(x).getBytes()));
 	}
 
-	@Override public String getString(String columnLabel) {
+	@Override public String getString(String columnLabel) throws SQLException {
 		return getString(findColumn(columnLabel));
 	}
 
-	@Override public boolean getBoolean(String columnLabel) {
+	@Override public boolean getBoolean(String columnLabel) throws SQLException {
 		return getBoolean(findColumn(columnLabel));
 	}
 
-	@Override public byte getByte(String columnLabel) {
+	@Override public byte getByte(String columnLabel) throws SQLException {
 		return getByte(findColumn(columnLabel));
 	}
 
-	@Override public short getShort(String columnLabel) {
+	@Override public short getShort(String columnLabel) throws SQLException {
 		return getShort(findColumn(columnLabel));
 	}
 
-	@Override public int getInt(String columnLabel) {
+	@Override public int getInt(String columnLabel) throws SQLException {
 		return getInt(findColumn(columnLabel));
 	}
 
-	@Override public long getLong(String columnLabel) {
+	@Override public long getLong(String columnLabel) throws SQLException {
 		return getLong(findColumn(columnLabel));
 	}
 
-	@Override public float getFloat(String columnLabel) {
+	@Override public float getFloat(String columnLabel) throws SQLException {
 		return getFloat(findColumn(columnLabel));
 	}
 
-	@Override public double getDouble(String columnLabel) {
+	@Override public double getDouble(String columnLabel) throws SQLException {
 		return getDouble(findColumn(columnLabel));
 	}
 
-	@Override public BigDecimal getBigDecimal(String columnLabel, int scale) {
+	@Override public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
 		return getBigDecimal(findColumn(columnLabel), scale);
 	}
 
-	@Override public byte[] getBytes(String columnLabel) {
+	@Override public byte[] getBytes(String columnLabel) throws SQLException {
 		return getBytes(findColumn(columnLabel));
 	}
 
-	@Override public Date getDate(String columnLabel) {
+	@Override public Date getDate(String columnLabel) throws SQLException {
 		return getDate(findColumn(columnLabel));
 	}
 
-	@Override public Time getTime(String columnLabel) {
+	@Override public Time getTime(String columnLabel) throws SQLException {
 		return getTime(findColumn(columnLabel));
 	}
 
-	@Override public Timestamp getTimestamp(String columnLabel) {
+	@Override public Timestamp getTimestamp(String columnLabel) throws SQLException {
 		return getTimestamp(findColumn(columnLabel));
 	}
 
-	@Override public InputStream getAsciiStream(String columnLabel) {
+	@Override public InputStream getAsciiStream(String columnLabel) throws SQLException {
 		return getAsciiStream(findColumn(columnLabel));
 	}
 
-	@Override public InputStream getUnicodeStream(String columnLabel) {
+	@Override public InputStream getUnicodeStream(String columnLabel) throws SQLException {
 		return getUnicodeStream(findColumn(columnLabel));
 	}
 
-	@Override public InputStream getBinaryStream(String columnLabel) {
+	@Override public InputStream getBinaryStream(String columnLabel) throws SQLException {
 		return getBinaryStream(findColumn(columnLabel));
 	}
 
 	private <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
-		List<Object> obj = getValues().get(index);
+		List<Object> obj = getValues().get(index - 1);
 		if (clzz.isInstance(obj)) {
 			return (U) obj;
 		} else {
@@ -201,8 +203,13 @@ public class InfluxDbResultSet implements ResultSet {
 		}
 	}
 
-	private List<List<Object>> getValues() {
-		return this.result.getSeries().get(resultPosition.intValue()).getValues();
+	List<List<Object>> getValues() {
+		List<QueryResult.Series> series = this.result.getSeries();
+		if (series == null) {
+			return List.of();
+		} else {
+			return series.get(seriesPosition.intValue()).getValues();
+		}
 	}
 
 	@Override public SQLWarning getWarnings() {
@@ -218,26 +225,30 @@ public class InfluxDbResultSet implements ResultSet {
 	}
 
 	@Override public ResultSetMetaData getMetaData() {
-		return null;
+		return new InfluxDbResultSetMetaData(this);
 	}
 
 	@Override public Object getObject(int columnIndex) {
 		return getValue(columnIndex, Object.class, Function.identity());
 	}
 
-	@Override public Object getObject(String columnLabel) {
+	@Override public Object getObject(String columnLabel) throws SQLException {
 		return getValue(findColumn(columnLabel), Object.class, Function.identity());
 	}
 
-	@Override public int findColumn(String columnLabel) {
-		return this.result.getSeries().get(resultPosition.intValue()).getColumns().indexOf(columnLabel);
+	@Override public int findColumn(String columnLabel) throws SQLException {
+		List<QueryResult.Series> series = this.result.getSeries();
+		if (series == null) {
+			throw new SQLException(String.format("No columen named %s", columnLabel));
+		}
+		return series.get(seriesPosition.intValue()).getColumns().indexOf(columnLabel) + 1;
 	}
 
 	@Override public Reader getCharacterStream(int columnIndex) {
 		return new InputStreamReader(getUnicodeStream(columnIndex));
 	}
 
-	@Override public Reader getCharacterStream(String columnLabel) {
+	@Override public Reader getCharacterStream(String columnLabel) throws SQLException {
 		return new InputStreamReader(getUnicodeStream(columnLabel));
 	}
 
@@ -245,39 +256,39 @@ public class InfluxDbResultSet implements ResultSet {
 		return getValue(columnIndex, BigDecimal.class, x -> BigDecimal.valueOf(Double.parseDouble(String.valueOf(x))));
 	}
 
-	@Override public BigDecimal getBigDecimal(String columnLabel) {
+	@Override public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
 		return getBigDecimal(findColumn(columnLabel));
 	}
 
 	@Override public boolean isBeforeFirst() {
-		return seriesPosition.get() < 0;
+		return valuesPosition.get() < 0;
 	}
 
 	@Override public boolean isAfterLast() {
-		return seriesPosition.get() >= getValues().size();
+		return valuesPosition.get() >= getValues().size();
 	}
 
 	@Override public boolean isFirst() {
-		return seriesPosition.get() == 0;
+		return valuesPosition.get() == 0;
 	}
 
 	@Override public boolean isLast() {
-		return seriesPosition.get() == getValues().size() - 1;
+		return valuesPosition.get() == getValues().size() - 1;
 	}
 
 	@Override public void beforeFirst() {
-		seriesPosition.set(-1);
+		valuesPosition.set(-1);
 	}
 
 	@Override public void afterLast() {
-		seriesPosition.set(getValues().size());
+		valuesPosition.set(getValues().size());
 	}
 
 	@Override public boolean first() {
 		if (getValues().isEmpty()) {
 			return false;
 		} else {
-			seriesPosition.set(0);
+			valuesPosition.set(0);
 			return true;
 		}
 	}
@@ -286,32 +297,32 @@ public class InfluxDbResultSet implements ResultSet {
 		if (getValues().isEmpty()) {
 			return false;
 		} else {
-			seriesPosition.set(getValues().size() - 1);
+			valuesPosition.set(getValues().size() - 1);
 			return true;
 		}
 	}
 
 	@Override public int getRow() {
-		return seriesPosition.get();
+		return valuesPosition.get();
 	}
 
 	@Override public boolean absolute(int row) {
 		if (row < 0) {
-			seriesPosition.set(getValues().size() - row);
+			valuesPosition.set(getValues().size() - row);
 			return !isBeforeFirst();
 		} else {
-			seriesPosition.set(row - 1);
+			valuesPosition.set(row - 1);
 			return !isAfterLast() && !isBeforeFirst();
 		}
 	}
 
 	@Override public boolean relative(int rows) {
-		seriesPosition.addAndGet(rows);
+		valuesPosition.addAndGet(rows);
 		return !isAfterLast() && !isBeforeFirst();
 	}
 
 	@Override public boolean previous() {
-		seriesPosition.addAndGet(-1);
+		valuesPosition.addAndGet(-1);
 		return !isBeforeFirst();
 	}
 
@@ -580,7 +591,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return new Date(cal.getTimeInMillis());
 	}
 
-	@Override public Date getDate(String columnLabel, Calendar cal) {
+	@Override public Date getDate(String columnLabel, Calendar cal) throws SQLException {
 		return getDate(findColumn(columnLabel), cal);
 	}
 
@@ -589,7 +600,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return new Time(cal.getTimeInMillis());
 	}
 
-	@Override public Time getTime(String columnLabel, Calendar cal) {
+	@Override public Time getTime(String columnLabel, Calendar cal) throws SQLException {
 		return getTime(findColumn(columnLabel), cal);
 	}
 
@@ -598,7 +609,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return new Timestamp(cal.getTimeInMillis());
 	}
 
-	@Override public Timestamp getTimestamp(String columnLabel, Calendar cal) {
+	@Override public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
 		return getTimestamp(findColumn(columnLabel), cal);
 	}
 
@@ -838,7 +849,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return null;
 	}
 
-	@Override public <T> T getObject(String columnLabel, Class<T> type) {
+	@Override public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
 		return getObject(findColumn(columnLabel), type);
 	}
 

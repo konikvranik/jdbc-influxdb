@@ -28,9 +28,13 @@ public class InfluxDbConnection implements Connection {
 	private final DatabaseMetaData influxDbMetadata;
 	private boolean isClosed;
 
-	public InfluxDbConnection(String url, String username, String password, InfluxDbDriver influxDbDriver) {
+	public InfluxDbConnection(String url, String username, String password, String database,
+		InfluxDbDriver influxDbDriver) {
 		influxDbClient =
 			username == null ? InfluxDBFactory.connect(url) : InfluxDBFactory.connect(url, username, password);
+		if (database != null) {
+			influxDbClient.setDatabase(database);
+		}
 		this.influxDbDriver = influxDbDriver;
 		influxDbMetadata = new InfluxDbMetadata(url, username, influxDbClient.version(), this);
 	}

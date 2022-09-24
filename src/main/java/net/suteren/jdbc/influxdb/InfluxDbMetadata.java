@@ -9,13 +9,13 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
 	private String userName;
 	private final String version;
-	private final InfluxDbDriver influxDbDriver;
+	private final InfluxDbConnection influxDbConnection;
 
-	public InfluxDbMetadata(String url, String userName, String version, InfluxDbDriver influxDbDriver) {
+	public InfluxDbMetadata(String url, String userName, String version, InfluxDbConnection influxDbConnection) {
 		this.url = url;
 		this.userName = userName;
 		this.version = version;
-		this.influxDbDriver = influxDbDriver;
+		this.influxDbConnection = influxDbConnection;
 	}
 
 	@Override public boolean allProceduresAreCallable() {
@@ -71,11 +71,11 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public int getDriverMajorVersion() {
-		return influxDbDriver.getMajorVersion();
+		return influxDbConnection.influxDbDriver.getMajorVersion();
 	}
 
 	@Override public int getDriverMinorVersion() {
-		return influxDbDriver.getMinorVersion();
+		return influxDbConnection.influxDbDriver.getMinorVersion();
 	}
 
 	@Override public boolean usesLocalFiles() {
@@ -499,7 +499,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 		return null;
 	}
 
-	@Override public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
+	@Override
+	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
 		return null;
 	}
 
@@ -516,7 +517,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) {
+	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
+		String columnNamePattern) {
 		return null;
 	}
 
@@ -617,7 +619,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public Connection getConnection() {
-		return new InfluxDbConnection(url, influxDbDriver);
+		return influxDbConnection;
 	}
 
 	@Override public boolean supportsSavepoints() {

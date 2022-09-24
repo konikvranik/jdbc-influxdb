@@ -1,6 +1,5 @@
 package net.suteren.jdbc.influxdb;
 
-import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -12,12 +11,22 @@ import lombok.extern.java.Log;
 
 @Log
 public class InfluxDbDriver implements java.sql.Driver {
-	@Override public Connection connect(String url, Properties info) throws SQLException {
+	@Override public InfluxDbConnection connect(String url, Properties info) throws SQLException {
 		Pattern p = Pattern.compile("jdbc:influxdb:(.*)");
 		Matcher m = p.matcher(url);
 		if (m.matches()) {
 			url = m.group(1);
-			return new InfluxDbConnection(url.matches("^https?://") ? url : "http://" + url,this);
+			String username = null;
+			String password = null;
+			if (info != null) {
+				username = info.getProperty("username");
+				if (username == null) {
+					username = info.getProperty("user");
+				}
+				password = info.getProperty("password");
+			}
+			return new InfluxDbConnection(url.matches("^https?://.*$") ? url : "http://" + url,
+				username, password, this);
 		} else {
 			throw new java.sql.SQLException(String.format("Invalid URL %s", url));
 		}

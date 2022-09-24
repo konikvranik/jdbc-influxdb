@@ -23,13 +23,14 @@ import org.influxdb.InfluxDBFactory;
 public class InfluxDbConnection implements Connection {
 
 	final InfluxDB influxDbClient;
-	private final InfluxDbDriver influxDbDriver;
+	final InfluxDbDriver influxDbDriver;
 	private final DatabaseMetaData influxDbMetadata;
 
-	public InfluxDbConnection(String url, InfluxDbDriver influxDbDriver) {
-		influxDbClient = InfluxDBFactory.connect(url);
+	public InfluxDbConnection(String url, String username, String password, InfluxDbDriver influxDbDriver) {
+		influxDbClient =
+			username == null ? InfluxDBFactory.connect(url) : InfluxDBFactory.connect(url, username, password);
 		this.influxDbDriver = influxDbDriver;
-		influxDbMetadata=new InfluxDbMetadata(url, null, influxDbClient.version(), influxDbDriver);
+		influxDbMetadata = new InfluxDbMetadata(url, username, influxDbClient.version(), this);
 	}
 
 	@Override public Statement createStatement() {

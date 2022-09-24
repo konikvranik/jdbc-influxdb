@@ -4,6 +4,8 @@ plugins {
 }
 dependencies {
 	implementation "org.influxdb:influxdb-java:2.22"
+	testImplementation "org.testcontainers:influxdb:1.17.3"
+	testImplementation "ch.qos.logback:logback-classic:1.4.1"
 }
 
 jar {

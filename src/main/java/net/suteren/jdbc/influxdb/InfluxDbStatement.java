@@ -2,193 +2,210 @@ package net.suteren.jdbc.influxdb;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.List;
 
-import org.influxdb.InfluxDB;
 import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 
 public class InfluxDbStatement implements Statement {
-	private final InfluxDB influxDbClient;
+	private final InfluxDbConnection influxDbConnection;
+	private SQLWarning error;
+	private String cursorName;
+	List<QueryResult.Result> results;
+	int resultPosition = 0;
+	private boolean isClosed = false;
 
-	public InfluxDbStatement(InfluxDB influxDbClient) {
-		this.influxDbClient = influxDbClient;
+	public InfluxDbStatement(InfluxDbConnection influxDbConnection) {
+		this.influxDbConnection = influxDbConnection;
 	}
 
-	@Override public ResultSet executeQuery(String sql) throws SQLException {
-		return new InfluxDbResultSet(influxDbClient.query(new Query(sql)));
+	@Override public ResultSet executeQuery(String sql) {
+		QueryResult query = influxDbConnection.influxDbClient.query(new Query(sql));
+		error = new SQLWarning(query.getError());
+		results = query.getResults();
+		return new InfluxDbResultSet(this);
 	}
 
-	@Override public int executeUpdate(String sql) throws SQLException {
+	@Override public int executeUpdate(String sql) {
 		return 0;
 	}
 
-	@Override public void close() throws SQLException {
-
+	@Override public void close() {
+		resultPosition = 0;
+		results = null;
+		isClosed = true;
 	}
 
-	@Override public int getMaxFieldSize() throws SQLException {
+	@Override public int getMaxFieldSize() {
 		return 0;
 	}
 
-	@Override public void setMaxFieldSize(int max) throws SQLException {
+	@Override public void setMaxFieldSize(int max) {
 
 	}
 
-	@Override public int getMaxRows() throws SQLException {
+	@Override public int getMaxRows() {
 		return 0;
 	}
 
-	@Override public void setMaxRows(int max) throws SQLException {
+	@Override public void setMaxRows(int max) {
 
 	}
 
-	@Override public void setEscapeProcessing(boolean enable) throws SQLException {
+	@Override public void setEscapeProcessing(boolean enable) {
 
 	}
 
-	@Override public int getQueryTimeout() throws SQLException {
+	@Override public int getQueryTimeout() {
 		return 0;
 	}
 
-	@Override public void setQueryTimeout(int seconds) throws SQLException {
+	@Override public void setQueryTimeout(int seconds) {
 
 	}
 
-	@Override public void cancel() throws SQLException {
+	@Override public void cancel() {
 
 	}
 
-	@Override public SQLWarning getWarnings() throws SQLException {
-		return null;
+	@Override public SQLWarning getWarnings() {
+		return new SQLWarning(error);
 	}
 
-	@Override public void clearWarnings() throws SQLException {
-
+	@Override public void clearWarnings() {
+		error = null;
 	}
 
-	@Override public void setCursorName(String name) throws SQLException {
-
+	@Override public void setCursorName(String name) {
+		cursorName = name;
 	}
 
-	@Override public boolean execute(String sql) throws SQLException {
+	@Override public boolean execute(String sql) {
 		return false;
 	}
 
-	@Override public ResultSet getResultSet() throws SQLException {
-		return null;
+	@Override public ResultSet getResultSet() {
+		return results != null && results.size() > resultPosition ?
+			new InfluxDbResultSet(this) :
+			null;
 	}
 
-	@Override public int getUpdateCount() throws SQLException {
+	@Override public int getUpdateCount() {
 		return 0;
 	}
 
-	@Override public boolean getMoreResults() throws SQLException {
-		return false;
+	@Override public boolean getMoreResults() {
+		if (results.size() > resultPosition) {
+			resultPosition++;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	@Override public void setFetchDirection(int direction) throws SQLException {
+	@Override public void setFetchDirection(int direction) {
 
 	}
 
-	@Override public int getFetchDirection() throws SQLException {
+	@Override public int getFetchDirection() {
+		return ResultSet.FETCH_UNKNOWN;
+	}
+
+	@Override public void setFetchSize(int rows) {
+
+	}
+
+	@Override public int getFetchSize() {
 		return 0;
 	}
 
-	@Override public void setFetchSize(int rows) throws SQLException {
+	@Override public int getResultSetConcurrency() {
+		return ResultSet.CONCUR_READ_ONLY;
+	}
+
+	@Override public int getResultSetType() {
+		return ResultSet.TYPE_SCROLL_INSENSITIVE;
+	}
+
+	@Override public void addBatch(String sql) {
 
 	}
 
-	@Override public int getFetchSize() throws SQLException {
-		return 0;
-	}
-
-	@Override public int getResultSetConcurrency() throws SQLException {
-		return 0;
-	}
-
-	@Override public int getResultSetType() throws SQLException {
-		return 0;
-	}
-
-	@Override public void addBatch(String sql) throws SQLException {
+	@Override public void clearBatch() {
 
 	}
 
-	@Override public void clearBatch() throws SQLException {
-
-	}
-
-	@Override public int[] executeBatch() throws SQLException {
+	@Override public int[] executeBatch() {
 		return new int[0];
 	}
 
-	@Override public Connection getConnection() throws SQLException {
+	@Override public Connection getConnection() {
+		return influxDbConnection;
+	}
+
+	@Override public boolean getMoreResults(int current) {
+		return getMoreResults();
+	}
+
+	@Override public ResultSet getGeneratedKeys() {
 		return null;
 	}
 
-	@Override public boolean getMoreResults(int current) throws SQLException {
+	@Override public int executeUpdate(String sql, int autoGeneratedKeys) {
+		return 0;
+	}
+
+	@Override public int executeUpdate(String sql, int[] columnIndexes) {
+		return 0;
+	}
+
+	@Override public int executeUpdate(String sql, String[] columnNames) {
+		return 0;
+	}
+
+	@Override public boolean execute(String sql, int autoGeneratedKeys) {
 		return false;
 	}
 
-	@Override public ResultSet getGeneratedKeys() throws SQLException {
+	@Override public boolean execute(String sql, int[] columnIndexes) {
+		return false;
+	}
+
+	@Override public boolean execute(String sql, String[] columnNames) {
+		return false;
+	}
+
+	@Override public int getResultSetHoldability() {
+		return 0;
+	}
+
+	@Override public boolean isClosed() {
+		return isClosed;
+	}
+
+	@Override public void setPoolable(boolean poolable) {
+
+	}
+
+	@Override public boolean isPoolable() {
+		return false;
+	}
+
+	@Override public void closeOnCompletion() {
+
+	}
+
+	@Override public boolean isCloseOnCompletion() {
+		return false;
+	}
+
+	@Override public <T> T unwrap(Class<T> iface) {
 		return null;
 	}
 
-	@Override public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
-		return 0;
-	}
-
-	@Override public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
-		return 0;
-	}
-
-	@Override public int executeUpdate(String sql, String[] columnNames) throws SQLException {
-		return 0;
-	}
-
-	@Override public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
-		return false;
-	}
-
-	@Override public boolean execute(String sql, int[] columnIndexes) throws SQLException {
-		return false;
-	}
-
-	@Override public boolean execute(String sql, String[] columnNames) throws SQLException {
-		return false;
-	}
-
-	@Override public int getResultSetHoldability() throws SQLException {
-		return 0;
-	}
-
-	@Override public boolean isClosed() throws SQLException {
-		return false;
-	}
-
-	@Override public void setPoolable(boolean poolable) throws SQLException {
-
-	}
-
-	@Override public boolean isPoolable() throws SQLException {
-		return false;
-	}
-
-	@Override public void closeOnCompletion() throws SQLException {
-
-	}
-
-	@Override public boolean isCloseOnCompletion() throws SQLException {
-		return false;
-	}
-
-	@Override public <T> T unwrap(Class<T> iface) throws SQLException {
-		return null;
-	}
-
-	@Override public boolean isWrapperFor(Class<?> iface) throws SQLException {
+	@Override public boolean isWrapperFor(Class<?> iface) {
 		return false;
 	}
 }

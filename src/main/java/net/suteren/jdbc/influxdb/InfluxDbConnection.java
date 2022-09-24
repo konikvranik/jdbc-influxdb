@@ -23,9 +23,13 @@ import org.influxdb.InfluxDBFactory;
 public class InfluxDbConnection implements Connection {
 
 	final InfluxDB influxDbClient;
+	private final InfluxDbDriver influxDbDriver;
+	private final DatabaseMetaData influxDbMetadata;
 
-	public InfluxDbConnection(String url) {
+	public InfluxDbConnection(String url, InfluxDbDriver influxDbDriver) {
 		influxDbClient = InfluxDBFactory.connect(url);
+		this.influxDbDriver = influxDbDriver;
+		influxDbMetadata=new InfluxDbMetadata(url, null, influxDbClient.version(), influxDbDriver);
 	}
 
 	@Override public Statement createStatement() {
@@ -69,7 +73,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public DatabaseMetaData getMetaData() {
-		return null;
+		return influxDbMetadata;
 	}
 
 	@Override public void setReadOnly(boolean readOnly) {

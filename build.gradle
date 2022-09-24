@@ -5,3 +5,10 @@ plugins {
 dependencies {
 	implementation "org.influxdb:influxdb-java:2.22"
 }
+
+jar {
+	from {
+		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+	duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}

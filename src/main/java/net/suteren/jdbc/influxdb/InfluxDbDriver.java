@@ -16,8 +16,8 @@ public class InfluxDbDriver implements java.sql.Driver {
 		Pattern p = Pattern.compile("jdbc:influxdb:(.*)");
 		Matcher m = p.matcher(url);
 		if (m.matches()) {
-			url = m.group(0);
-			new InfluxDbConnection(url);
+			url = m.group(1);
+			return new InfluxDbConnection(url.matches("^https?://") ? url : "http://" + url,this);
 		} else {
 			throw new java.sql.SQLException(String.format("Invalid URL %s", url));
 		}
@@ -32,11 +32,11 @@ public class InfluxDbDriver implements java.sql.Driver {
 	}
 
 	@Override public int getMajorVersion() {
-		return 0;
+		return 1;
 	}
 
 	@Override public int getMinorVersion() {
-		return 1;
+		return 0;
 	}
 
 	@Override public boolean jdbcCompliant() {

@@ -13,6 +13,8 @@ import org.testcontainers.utility.DockerImageName;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 
+import static org.junit.Assert.assertTrue;
+
 public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 
 	public static final String USERNAME = "admin";
@@ -38,6 +40,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		properties.put("password", PASSWORD);
 		InfluxDbConnection conn =
 			influxDbDriver.connect(String.format("jdbc:influxdb:%s?db=test", influxDbContainer.getUrl()), properties);
+		assertTrue(conn.isValid(1));
 		ResultSet r = conn.createStatement().executeQuery("select * from test");
 
 	}

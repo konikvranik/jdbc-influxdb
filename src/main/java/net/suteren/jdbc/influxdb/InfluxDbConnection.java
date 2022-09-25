@@ -40,7 +40,7 @@ public class InfluxDbConnection implements Connection {
 		influxDbMetadata = new InfluxDbMetadata(url, username, influxDbClient.version(), influxDbDriver, this);
 	}
 
-	@Override public Statement createStatement() {
+	@Override public InfluxDbStatement createStatement() {
 		return new InfluxDbStatement(this, influxDbClient);
 	}
 

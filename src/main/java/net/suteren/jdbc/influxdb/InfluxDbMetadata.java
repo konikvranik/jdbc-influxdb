@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
+import java.sql.SQLException;
+
+import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 
 public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
@@ -503,8 +506,9 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
-		return null;
+	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
+		throws SQLException {
+		return new GetTablesResultSet(influxDbConnection, tableNamePattern);
 	}
 
 	@Override public ResultSet getSchemas() {

@@ -2,10 +2,12 @@ package net.suteren.jdbc.influxdb.statement;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import org.influxdb.InfluxDB;
+import org.jetbrains.annotations.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -98,4 +100,19 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 		return false;
 	}
 
+	@Override public int executeUpdate(String sql, String[] columnNames) throws SQLException {
+		return executeUpdate(sql, getColumnIndexes(columnNames));
+	}
+
+	@Override public boolean execute(String sql, String[] columnNames) throws SQLException {
+		return execute(sql, getColumnIndexes(columnNames));
+	}
+
+	@NotNull private int[] getColumnIndexes(String[] columnNames) throws SQLException {
+		int[] columnIndexes = new int[columnNames.length];
+		for (int i = 0; i < columnNames.length; i++) {
+			columnIndexes[i] = resultSet.findColumn(columnNames[i]);
+		}
+		return columnIndexes;
+	}
 }

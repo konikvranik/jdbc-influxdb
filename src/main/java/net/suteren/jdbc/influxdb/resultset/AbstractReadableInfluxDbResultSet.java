@@ -35,7 +35,7 @@ public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDb
 		this.statement = statement;
 	}
 
-	protected <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
+	public  <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
 		getCurrentSeries();
 		Object obj = getCurrentRow().get(index - 1);
 		if (clzz.isInstance(obj)) {

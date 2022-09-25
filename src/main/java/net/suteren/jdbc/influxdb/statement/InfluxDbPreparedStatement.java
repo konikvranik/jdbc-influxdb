@@ -15,6 +15,7 @@ import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
+import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -32,7 +33,7 @@ public class InfluxDbPreparedStatement extends InfluxDbStatement implements Prep
 		this.sql = sql;
 	}
 
-	@Override public ResultSet executeQuery() {
+	@Override public ResultSet executeQuery() throws SQLException {
 		return executeQuery(sql);
 	}
 

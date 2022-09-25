@@ -1,6 +1,5 @@
 package net.suteren.jdbc.influxdb.resultset;
 
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.List;
@@ -35,7 +34,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 		}
 	}
 
-	protected Optional<QueryResult.Result> getCurrentResult() {
+	public Optional<QueryResult.Result> getCurrentResult() {
 		return Optional.ofNullable(results)
 			.map(r -> r.get(resultPosition.get()));
 	}
@@ -174,7 +173,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 
 	}
 
-	@Override public ResultSetMetaData getMetaData() {
+	@Override public InfluxDbResultSetMetaData getMetaData() {
 		return new InfluxDbResultSetMetaData(this);
 	}
 

@@ -32,9 +32,11 @@ public class InfluxDbConnection implements Connection {
 	private final InfluxDbMetadata influxDbMetadata;
 	private boolean isClosed;
 	private final Logger log;
-	private static final Pattern KEEP_ALIVE_SQL_PATTERN = Pattern.compile("^\\s*select\\s+'keep alive'\\s*$");
+	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
+		Pattern.compile("\\s*select\\s+['\"]keep alive['\"]\\s*", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1");
+		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1",
+			Pattern.CASE_INSENSITIVE);
 
 	public InfluxDbConnection(String url, String username, String password, String database,
 		InfluxDbDriver influxDbDriver) {

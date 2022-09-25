@@ -1,7 +1,7 @@
 package net.suteren.jdbc.influxdb;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -35,14 +35,15 @@ public class InfluxDbDriver implements java.sql.Driver {
 				database.set(info.getProperty("database"));
 			}
 			try {
-				Map<String, Set<String>> params = Arrays.stream(new URI(url).getQuery().split("&"))
+				url = url.matches("^https?://.*$") ? url : "http://" + url;
+				Map<String, Set<String>> params = Arrays.stream(new URL(url).getQuery().split("&"))
 					.map(x -> x.split("=", 2))
 					.collect(Collectors.groupingBy(x -> x[0], Collectors.mapping(x -> x[1], Collectors.toSet())));
 				params.get("db").forEach(database::set);
-			} catch (URISyntaxException e) {
+			} catch (MalformedURLException e) {
 				throw new SQLException(String.format("Invalid URL %s", url), e);
 			}
-			return new InfluxDbConnection(url.matches("^https?://.*$") ? url : "http://" + url,
+			return new InfluxDbConnection(url,
 				username, password, database.get(), this);
 		} else {
 			throw new java.sql.SQLException(String.format("Invalid URL %s", url));

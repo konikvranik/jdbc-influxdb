@@ -9,14 +9,12 @@ import java.util.logging.Logger;
 
 import org.influxdb.dto.QueryResult;
 
-import lombok.extern.java.Log;
-
 public abstract class AbstractInfluxDbMultiResultSet
 	extends net.suteren.jdbc.AbstractBaseResultSet {
 	private final List<QueryResult.Result> results;
-	private final AtomicInteger resultPosition = new AtomicInteger(0);
-	final AtomicInteger seriesPosition = new AtomicInteger(0);
-	final AtomicInteger rowPosition = new AtomicInteger(-1);
+	protected final AtomicInteger resultPosition = new AtomicInteger(0);
+	protected final AtomicInteger seriesPosition = new AtomicInteger(0);
+	protected final AtomicInteger rowPosition = new AtomicInteger(-1);
 	private boolean isClosed = false;
 	private String cursorName;
 	protected Logger log;
@@ -212,5 +210,9 @@ public abstract class AbstractInfluxDbMultiResultSet
 
 	@Override public int getHoldability() {
 		return HOLD_CURSORS_OVER_COMMIT;
+	}
+
+	public List<QueryResult.Result> getResults() {
+		return results;
 	}
 }

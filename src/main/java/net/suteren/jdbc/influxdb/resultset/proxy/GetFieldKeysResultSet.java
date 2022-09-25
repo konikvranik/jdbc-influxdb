@@ -2,6 +2,7 @@ package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.function.Function;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 
@@ -14,8 +15,8 @@ public class GetFieldKeysResultSet extends AbstractProxyResultSet {
 				"SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION", "IS_NULLABLE",
 				"SCOPE_CATALOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", "IS_AUTOINCREMENT",
 				"IS_GENERATEDCOLUMN", },
-			new Object[] { null, null, null, null, Types.VARCHAR, "string", null, null, null, null, null, null, null,
-				null, null, null, null, null, null, null, null, null, null, null });
+			new Object[] { null, null, null, null, Types.VARCHAR, "string", null, null, null, null, true, null, null,
+				null, null, null, null, true, null, null, null, null, null, null });
 	}
 
 	private static String getWithClause(String tableNamePattern) {
@@ -29,9 +30,18 @@ public class GetFieldKeysResultSet extends AbstractProxyResultSet {
 			return 1;
 		case 5:
 		case 6:
+		case 22:
 			return 2;
 		default:
 			return 0;
+		}
+	}
+
+	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> o) throws SQLException {
+		if (columnIndex == 3 || columnIndex == 21) {
+			return (T) getMetaData().getTableName(columnIndex);
+		} else {
+			return super.mapOrDefault(columnIndex, o);
 		}
 	}
 }

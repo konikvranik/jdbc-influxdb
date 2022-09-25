@@ -86,7 +86,7 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 		return getBinaryStream(findColumn(columnLabel));
 	}
 
-	protected abstract <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert);
+	protected abstract <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) throws SQLException;
 
 	public Reader getCharacterStream(String columnLabel) throws SQLException {
 		return new InputStreamReader(getUnicodeStream(columnLabel));

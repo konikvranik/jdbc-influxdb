@@ -19,6 +19,7 @@ import net.suteren.jdbc.influxdb.InfluxDbDriver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
@@ -83,5 +84,40 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 			tables.getString(4);
 		}
 		assertFalse(tables.getStatement().getMoreResults());
+
+		ResultSet columns = metaData.getColumns(null, null, null, null);
+		while (columns.next()) {
+
+			assertNull(columns.getString("TABLE_CAT"));
+			assertNull(columns.getString("TABLE_SCHEM"));
+			assertEquals("measurement1", columns.getString("TABLE_NAME"));
+			assertEquals("field1", columns.getString("COLUMN_NAME"));
+			assertEquals("integer", columns.getString("DATA_TYPE"));
+			assertEquals("integer", columns.getString("TYPE_NAME"));
+			assertNull(columns.getString("COLUMN_SIZE"));
+			assertNull(columns.getString("BUFFER_LENGTH"));
+			assertNull(columns.getString("DECIMAL_DIGITS"));
+			assertNull(columns.getString("NUM_PREC_RADIX"));
+			assertTrue(columns.getBoolean("NULLABLE"));
+			assertNull(columns.getString("REMARKS"));
+			assertNull(columns.getString("COLUMN_DEF"));
+			assertNull(columns.getString("SQL_DATA_TYPE"));
+			assertNull(columns.getString("SQL_DATETIME_SUB"));
+			assertNull(columns.getString("CHAR_OCTET_LENGTH"));
+			assertNull(columns.getString("ORDINAL_POSITION"));
+			assertTrue(columns.getBoolean("IS_NULLABLE"));
+			assertNull(columns.getString("SCOPE_CATALOG"));
+			assertNull(columns.getString("SCOPE_SCHEMA"));
+			assertEquals("measurement1", columns.getString("SCOPE_TABLE"));
+			assertEquals("integer", columns.getString("SOURCE_DATA_TYPE"));
+			assertNull(columns.getObject("IS_AUTOINCREMENT"));
+			assertNull(columns.getObject("IS_GENERATEDCOLUMN"));
+
+			columns.getString(1);
+			columns.getString(2);
+			columns.getString(3);
+			columns.getString(4);
+		}
+
 	}
 }

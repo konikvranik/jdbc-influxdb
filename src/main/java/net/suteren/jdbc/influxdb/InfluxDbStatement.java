@@ -4,18 +4,17 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.List;
 
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 
+import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
+
 public class InfluxDbStatement implements Statement {
 	private final InfluxDbConnection influxDbConnection;
 	private SQLWarning error;
-	private String cursorName;
-	List<QueryResult.Result> results;
-	int resultPosition = 0;
 	private boolean isClosed = false;
+	private InfluxDbResultSet resultSet;
 
 	public InfluxDbStatement(InfluxDbConnection influxDbConnection) {
 		this.influxDbConnection = influxDbConnection;
@@ -24,8 +23,8 @@ public class InfluxDbStatement implements Statement {
 	@Override public ResultSet executeQuery(String sql) {
 		QueryResult query = influxDbConnection.influxDbClient.query(new Query(sql));
 		error = new SQLWarning(query.getError());
-		results = query.getResults();
-		return new InfluxDbResultSet(this);
+		resultSet = new InfluxDbResultSet(this, query.getResults());
+		return resultSet;
 	}
 
 	@Override public int executeUpdate(String sql) {
@@ -33,8 +32,7 @@ public class InfluxDbStatement implements Statement {
 	}
 
 	@Override public void close() {
-		resultPosition = 0;
-		results = null;
+		getResultSet().close();
 		isClosed = true;
 	}
 
@@ -79,17 +77,15 @@ public class InfluxDbStatement implements Statement {
 	}
 
 	@Override public void setCursorName(String name) {
-		cursorName = name;
+		getResultSet().setCursorName( name);
 	}
 
 	@Override public boolean execute(String sql) {
 		return false;
 	}
 
-	@Override public ResultSet getResultSet() {
-		return results != null && results.size() > resultPosition ?
-			new InfluxDbResultSet(this) :
-			null;
+	@Override public InfluxDbResultSet getResultSet() {
+		return resultSet;
 	}
 
 	@Override public int getUpdateCount() {
@@ -97,12 +93,7 @@ public class InfluxDbStatement implements Statement {
 	}
 
 	@Override public boolean getMoreResults() {
-		if (results.size() > resultPosition) {
-			resultPosition++;
-			return true;
-		} else {
-			return false;
-		}
+		return resultSet.getMoreResults();
 	}
 
 	@Override public void setFetchDirection(int direction) {

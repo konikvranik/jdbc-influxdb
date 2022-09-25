@@ -1,4 +1,4 @@
-package net.suteren.jdbc.influxdb;
+package net.suteren.jdbc.influxdb.resultset;
 
 import java.sql.ResultSetMetaData;
 import java.util.List;
@@ -6,15 +6,17 @@ import java.util.List;
 import org.influxdb.dto.QueryResult;
 
 public class InfluxDbResultSetMetaData implements ResultSetMetaData {
-	private final InfluxDbResultSet influxDbResultSet;
+	private final InfluxDbMultiResultSet influxDbResultSet;
 
-	public InfluxDbResultSetMetaData(InfluxDbResultSet influxDbResultSet) {
+	public InfluxDbResultSetMetaData(InfluxDbMultiResultSet influxDbResultSet) {
 		this.influxDbResultSet = influxDbResultSet;
 	}
 
 	@Override public int getColumnCount() {
-		List<QueryResult.Series> series = influxDbResultSet.result.getSeries();
-		return series == null ? 0 : series.get(influxDbResultSet.seriesPosition.get()).getColumns().size();
+		return influxDbResultSet.getCurrentSeries()
+			.map(QueryResult.Series::getColumns)
+			.map(List::size)
+			.orElse(0);
 	}
 
 	@Override public boolean isAutoIncrement(int column) {
@@ -50,12 +52,10 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnName(int column) {
-		List<QueryResult.Series> series = influxDbResultSet.result.getSeries();
-		if (series == null) {
-			return null;
-		}
-		return series.get(influxDbResultSet.seriesPosition.get()).getColumns()
-			.get(column - 1);
+		return influxDbResultSet.getCurrentSeries()
+			.map(QueryResult.Series::getColumns)
+			.map(c -> c.get(column - 1))
+			.orElse(null);
 	}
 
 	@Override public String getSchemaName(int column) {
@@ -71,11 +71,9 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getTableName(int column) {
-		List<QueryResult.Series> series = influxDbResultSet.result.getSeries();
-		if (series == null) {
-			return null;
-		}
-		return series.get(influxDbResultSet.seriesPosition.get()).getName();
+		return influxDbResultSet.getCurrentSeries()
+			.map(QueryResult.Series::getName)
+			.orElse(null);
 	}
 
 	@Override public String getCatalogName(int column) {
@@ -103,7 +101,7 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnClassName(int column) {
-		return influxDbResultSet.getValues().get(influxDbResultSet.seriesPosition.get()).get(column).getClass()
+		return influxDbResultSet.getCurrentValues().get(influxDbResultSet.seriesPosition.get()).get(column).getClass()
 			.getName();
 	}
 

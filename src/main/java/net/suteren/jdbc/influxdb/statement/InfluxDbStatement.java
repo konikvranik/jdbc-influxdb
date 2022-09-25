@@ -7,9 +7,11 @@ import org.influxdb.InfluxDB;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 
+import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
+@Log
 public class InfluxDbStatement extends AbstractInfluxDbStatement {
 
 	public InfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {
@@ -18,7 +20,10 @@ public class InfluxDbStatement extends AbstractInfluxDbStatement {
 
 	@Override public InfluxDbResultSet executeQuery(String sql) throws SQLException {
 		try {
-			QueryResult query = client.query(new Query(getConnection().nativeSQL(sql)));
+			log.fine(() -> String.format("Executing query %s", sql));
+			String command = getConnection().nativeSQL(sql);
+			log.fine(() -> String.format("Executing NATIVE query %s", command));
+			QueryResult query = client.query(new Query(command));
 			error = new SQLWarning(query.getError());
 			resultSet = new InfluxDbResultSet(this, query.getResults());
 			return resultSet;

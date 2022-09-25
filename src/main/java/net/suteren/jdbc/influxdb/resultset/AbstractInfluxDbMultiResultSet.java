@@ -9,12 +9,14 @@ import java.util.logging.Logger;
 
 import org.influxdb.dto.QueryResult;
 
-public abstract class AbstractInfluxDbMultiResultSet
-	extends net.suteren.jdbc.AbstractBaseResultSet {
+import lombok.Getter;
+import net.suteren.jdbc.AbstractBaseResultSet;
+
+public abstract class AbstractInfluxDbMultiResultSet extends AbstractBaseResultSet {
 	private final List<QueryResult.Result> results;
-	protected final AtomicInteger resultPosition = new AtomicInteger(0);
-	protected final AtomicInteger seriesPosition = new AtomicInteger(0);
-	protected final AtomicInteger rowPosition = new AtomicInteger(-1);
+	@Getter protected final AtomicInteger resultPosition = new AtomicInteger(0);
+	@Getter protected final AtomicInteger seriesPosition = new AtomicInteger(0);
+	@Getter protected final AtomicInteger rowPosition = new AtomicInteger(-1);
 	private boolean isClosed = false;
 	private String cursorName;
 	protected Logger log;
@@ -30,10 +32,12 @@ public abstract class AbstractInfluxDbMultiResultSet
 			.filter(s -> seriesPosition.intValue() + 1 < s)
 			.isPresent()) {
 			seriesPosition.incrementAndGet();
+			rowPosition.set(0);
 			return true;
 		} else if (resultPosition.intValue() + 1 < results.size()) {
 			resultPosition.incrementAndGet();
 			seriesPosition.set(0);
+			rowPosition.set(0);
 			return true;
 		} else {
 			return false;

@@ -129,7 +129,7 @@ public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDb
 		return getValue(columnIndex, BigDecimal.class, x -> BigDecimal.valueOf(Double.parseDouble(String.valueOf(x))));
 	}
 
-	@Override public Statement getStatement() {
+	@Override public InfluxDbStatement getStatement() {
 		return statement;
 	}
 

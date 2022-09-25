@@ -10,7 +10,6 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.NClob;
 import java.sql.Ref;
-import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLType;
@@ -21,8 +20,13 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
+
+import org.influxdb.dto.QueryResult;
 
 import net.suteren.jdbc.AbstractBaseResultSet;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
@@ -32,63 +36,141 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	private final String[] columns;
 	private final Object[] defaults;
 	private final InfluxDbResultSet influxDbResultSet;
+	private final Logger log;
 
 	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
 		this.influxDbResultSet = influxDbResultSet;
 		this.columns = columns;
 		this.defaults = defaults;
+		log = influxDbResultSet.getStatement().getConnection().getMetaData().getDriver().getParentLogger();
 	}
 
 	@Override public boolean next() {
-		return influxDbResultSet.next();
+		log.fine("Next row.");
+		if (influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size()) {
+			influxDbResultSet.getRowPosition().addAndGet(1);
+		} else {
+			influxDbResultSet.getMoreResults();
+		}
+		return influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size();
 	}
 
 	@Override public boolean isBeforeFirst() {
-		return influxDbResultSet.isBeforeFirst();
+		return influxDbResultSet.getRowPosition().get() < 0 && influxDbResultSet.getSeriesPosition().intValue() <= 0
+			&& influxDbResultSet.getResultPosition().intValue() <= 0;
 	}
 
 	@Override public boolean isAfterLast() {
-		return influxDbResultSet.isAfterLast();
+		return influxDbResultSet.getRowPosition().intValue() >= influxDbResultSet.getCurrentRows().size()
+			&& influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() >= s)
+			.isPresent() && influxDbResultSet.getResultPosition().intValue() >= influxDbResultSet.getResults().size();
 	}
 
 	@Override public boolean isFirst() {
-		return influxDbResultSet.isFirst();
+		return influxDbResultSet.getRowPosition().get() == 0 && influxDbResultSet.getSeriesPosition().intValue() == 0
+			&& influxDbResultSet.getResultPosition().intValue() == 0;
 	}
 
 	@Override public boolean isLast() {
-		return influxDbResultSet.isLast();
+		return influxDbResultSet.getRowPosition().get() == influxDbResultSet.getCurrentRows().size() - 1
+			&& influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() == s - 1)
+			.isPresent()
+			&& influxDbResultSet.getResultPosition().intValue() == influxDbResultSet.getResults().size() - 1;
 	}
 
 	@Override public void beforeFirst() {
-		influxDbResultSet.beforeFirst();
+		influxDbResultSet.getRowPosition().set(-1);
+		influxDbResultSet.getSeriesPosition().set(0);
+		influxDbResultSet.getResultPosition().set(0);
 	}
 
 	@Override public void afterLast() {
-		influxDbResultSet.afterLast();
+		influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size());
+		influxDbResultSet.getSeriesPosition().set(influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.orElse(0));
+		influxDbResultSet.getResultPosition().set(influxDbResultSet.getResults().size() - 1);
 	}
 
 	@Override public boolean first() {
-		return influxDbResultSet.first();
+		influxDbResultSet.getResultPosition().set(0);
+		influxDbResultSet.getSeriesPosition().set(0);
+		if (influxDbResultSet.getCurrentRows().isEmpty()) {
+			return false;
+		} else {
+			influxDbResultSet.getRowPosition().set(0);
+			return true;
+		}
 	}
 
 	@Override public boolean last() {
-		return influxDbResultSet.last();
+		influxDbResultSet.getResultPosition().set(influxDbResultSet.getResults().size() - 1);
+		influxDbResultSet.getSeriesPosition().set(influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.map(s -> s - 1)
+			.orElse(0));
+		if (influxDbResultSet.getCurrentRows().isEmpty()) {
+			return false;
+		} else {
+			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
+			return true;
+		}
 	}
 
 	@Override public int getRow() {
-		return influxDbResultSet.getRow();
+		int count = influxDbResultSet.getResults().stream().limit(influxDbResultSet.getResultPosition().intValue())
+			.flatMapToInt(r -> r.getSeries().stream()
+				.map(QueryResult.Series::getValues)
+				.mapToInt(List::size))
+			.sum();
+		count += influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries).stream()
+			.limit(influxDbResultSet.getSeriesPosition().intValue())
+			.flatMap(Collection::stream)
+			.map(QueryResult.Series::getValues)
+			.mapToInt(List::size)
+			.sum();
+		return count + influxDbResultSet.getRowPosition().intValue() + 1;
 	}
 
 	@Override public boolean absolute(int row) {
-		return influxDbResultSet.absolute(row);
+		if (row < 0) {
+			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - row);
+			return !isBeforeFirst();
+		} else {
+			influxDbResultSet.getRowPosition().set(row - 1);
+			return !isAfterLast() && !isBeforeFirst();
+		}
 	}
 
 	@Override public boolean relative(int rows) {
-		return influxDbResultSet.relative(rows);
+		influxDbResultSet.getRowPosition().addAndGet(rows);
+		return !isAfterLast() && !isBeforeFirst();
 	}
 
 	@Override public boolean previous() {
-		return influxDbResultSet.previous();
+		if (influxDbResultSet.getRowPosition().intValue() > 0) {
+			influxDbResultSet.getRowPosition().decrementAndGet();
+		} else if (influxDbResultSet.getSeriesPosition().intValue() > 0) {
+			influxDbResultSet.getSeriesPosition().decrementAndGet();
+			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
+		} else if (influxDbResultSet.getResultPosition().intValue() > 0) {
+			influxDbResultSet.getResultPosition().decrementAndGet();
+			influxDbResultSet.getSeriesPosition().set(influxDbResultSet.getCurrentResult()
+				.map(QueryResult.Result::getSeries)
+				.map(List::size)
+				.orElse(0) - 1);
+			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
+		}
+		return !isBeforeFirst();
 	}
 
 	@Override public void setFetchDirection(int direction) {
@@ -131,7 +213,7 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 		influxDbResultSet.clearWarnings();
 	}
 
-	@Override public ResultSetMetaData getMetaData() {
+	@Override public AbstractProxyResultSetMetadata getMetaData() {
 		return new AbstractProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns);
 	}
 

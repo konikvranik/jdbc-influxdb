@@ -1,7 +1,6 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 
 import lombok.Getter;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSetMetaData;
@@ -79,7 +78,7 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 		return influxDbResultSetMetaData.getCatalogName(abstractProxyResultSet.remapIndex(column));
 	}
 
-	@Override public int getColumnType(int column) throws SQLException {
+	@Override public int getColumnType(int column) {
 		int index = abstractProxyResultSet.remapIndex(column);
 		if (abstractProxyResultSet.getMetaData().getColumnCount() >= index && index > 0) {
 			return influxDbResultSetMetaData.getColumnType(index);
@@ -88,7 +87,7 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 		}
 	}
 
-	@Override public String getColumnTypeName(int column) throws SQLException {
+	@Override public String getColumnTypeName(int column) {
 		int index = abstractProxyResultSet.remapIndex(column);
 		if (abstractProxyResultSet.getMetaData().getColumnCount() >= index && index > 0) {
 			return influxDbResultSetMetaData.getColumnTypeName(index);

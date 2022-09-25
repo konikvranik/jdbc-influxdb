@@ -510,7 +510,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
+	public GetTablesResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
 		throws SQLException {
 		return new GetTablesResultSet(influxDbConnection,
 			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);

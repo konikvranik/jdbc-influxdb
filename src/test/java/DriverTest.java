@@ -1,7 +1,8 @@
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.influxdb.InfluxDB;
@@ -16,6 +17,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
+import net.suteren.jdbc.influxdb.InfluxDbMetadata;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,8 +39,10 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		influxDB = influxDbContainer.withUsername(USERNAME).withPassword(PASSWORD).getNewInfluxDB();
 		influxDB.query(new Query(String.format("CREATE DATABASE %s;", DATABASE)));
 		influxDB.setDatabase(DATABASE);
-		Point point = Point.measurement("measurement1").addField("field1", 13).tag("tag1", "tag1value").build();
-		influxDB.write(point);
+		influxDB.write(Point.measurement("measurement1").addField("field1", 13).tag("tag1", "tag1value").build());
+		influxDB.write(Point.measurement("measurement1").addField("field2", 13).tag("tag2", "tag2value").build());
+		influxDB.write(Point.measurement("measurement2").addField("field2", 13).tag("tag2", "tag2value").build());
+		influxDB.write(Point.measurement("measurement2").addField("field3", 13).tag("tag3", "tag3value").build());
 	}
 
 	@After
@@ -51,8 +56,10 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		properties.put("username", USERNAME);
 		properties.put("password", PASSWORD);
 		properties.put("database", DATABASE);
+		String database = "test";
+		String url = influxDbContainer.getUrl();
 		try (InfluxDbConnection conn =
-			influxDbDriver.connect(String.format("jdbc:influxdb:%s?db=test", influxDbContainer.getUrl()), properties)) {
+			influxDbDriver.connect(String.format("jdbc:influxdb:%s?db=%s", url, database), properties)) {
 			assertTrue(conn.isValid(1));
 			assertConnectionMetadata(conn.getMetaData());
 			ResultSet r = conn.createStatement().executeQuery("show databases");
@@ -75,26 +82,87 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		assertEquals("databases", metaData.getTableName(1));
 	}
 
-	private static void assertConnectionMetadata(DatabaseMetaData metaData) throws SQLException {
-		ResultSet tables = metaData.getTables(null, null, null, null);
+	private static void assertConnectionMetadata(InfluxDbMetadata metaData) throws SQLException {
+		GetTablesResultSet tables = metaData.getTables(null, null, null, null);
+		assertTrue(tables.isBeforeFirst());
+		assertFalse(tables.isFirst());
+		assertFalse(tables.isLast());
+		assertFalse(tables.isAfterLast());
+		Iterator<String> tableNames = List.of("measurement1", "measurement2").iterator();
 		while (tables.next()) {
-			assertTable(tables, "measurement1");
+			assertTable(tables, tableNames.next());
 		}
+		assertFalse(tables.isBeforeFirst());
+		assertFalse(tables.isFirst());
+		assertFalse(tables.isLast());
+		assertTrue(tables.isAfterLast());
+
 		assertFalse(tables.getStatement().getMoreResults());
+
 		tables = metaData.getTables(null, null, "%", null);
+		tableNames = List.of("measurement1", "measurement2").iterator();
 		while (tables.next()) {
-			assertTable(tables, "measurement1");
+			assertTable(tables, tableNames.next());
 		}
 		assertFalse(tables.getStatement().getMoreResults());
 
 		ResultSet columns = metaData.getColumns(null, null, null, null);
+		Iterator<String[]> expectations = List.of(
+			new String[] { "measurement1", "field1", "integer" },
+			new String[] { "measurement1", "field2", "integer" },
+			new String[] { "measurement2", "field2", "integer" },
+			new String[] { "measurement2", "field3", "integer" },
+			new String[] { "measurement1", "tag1", "string" },
+			new String[] { "measurement1", "tag2", "string" },
+			new String[] { "measurement2", "tag2", "string" },
+			new String[] { "measurement2", "tag3", "string" }
+		).iterator();
 		while (columns.next()) {
-			assertField(columns, "measurement1", "field1", "integer");
+			String[] ex = expectations.next();
+			assertField(columns, ex[0], ex[1], ex[2]);
+		}
+
+		columns = metaData.getColumns(null, null, "%", null);
+		expectations = List.of(
+			new String[] { "measurement1", "field1", "integer" },
+			new String[] { "measurement1", "field2", "integer" },
+			new String[] { "measurement2", "field2", "integer" },
+			new String[] { "measurement2", "field3", "integer" },
+			new String[] { "measurement1", "tag1", "string" },
+			new String[] { "measurement1", "tag2", "string" },
+			new String[] { "measurement2", "tag2", "string" },
+			new String[] { "measurement2", "tag3", "string" }
+		).iterator();
+		while (columns.next()) {
+			String[] ex = expectations.next();
+			assertField(columns, ex[0], ex[1], ex[2]);
+		}
+		assertTrue(columns.isAfterLast());
+		expectations = List.of(
+			new String[] { "measurement2", "tag3", "string" },
+			new String[] { "measurement2", "tag2", "string" },
+			new String[] { "measurement1", "tag2", "string" },
+			new String[] { "measurement1", "tag1", "string" },
+			new String[] { "measurement2", "field3", "integer" },
+			new String[] { "measurement2", "field2", "integer" },
+			new String[] { "measurement1", "field2", "integer" },
+			new String[] { "measurement1", "field1", "integer" }
+		).iterator();
+		while (columns.previous()) {
+			String[] ex = expectations.next();
+			assertField(columns, ex[0], ex[1], ex[2]);
 		}
 
 		columns = metaData.getColumns(null, null, "measurement1", null);
+		expectations = List.of(
+			new String[] { "measurement1", "field1", "integer" },
+			new String[] { "measurement1", "field2", "integer" },
+			new String[] { "measurement1", "tag1", "string" },
+			new String[] { "measurement1", "tag2", "string" }
+		).iterator();
 		while (columns.next()) {
-			assertField(columns, "measurement1", "field1", "integer");
+			String[] ex = expectations.next();
+			assertField(columns, ex[0], ex[1], ex[2]);
 		}
 
 	}

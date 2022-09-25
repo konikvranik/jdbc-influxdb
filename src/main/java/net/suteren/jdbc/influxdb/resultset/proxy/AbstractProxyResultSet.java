@@ -46,13 +46,28 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	}
 
 	@Override public boolean next() {
-		log.fine("Next row.");
-		if (influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size()) {
-			influxDbResultSet.getRowPosition().addAndGet(1);
-		} else {
-			influxDbResultSet.getMoreResults();
+		if (isAfterLast()) {
+			return false;
+		} else if (isBeforeFirst()) {
+			return first();
 		}
-		return influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size();
+		if (influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size()) {
+			influxDbResultSet.getRowPosition().incrementAndGet();
+		} else if (influxDbResultSet.getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() + 1 < s)
+			.isPresent()) {
+			influxDbResultSet.getSeriesPosition().incrementAndGet();
+			influxDbResultSet.getRowPosition().set(0);
+		} else if (influxDbResultSet.getResultPosition().intValue() + 1 < influxDbResultSet.getResults().size()) {
+			influxDbResultSet.getResultPosition().incrementAndGet();
+			influxDbResultSet.getSeriesPosition().set(0);
+			influxDbResultSet.getRowPosition().set(0);
+		} else {
+			influxDbResultSet.getRowPosition().incrementAndGet();
+		}
+		return !isAfterLast();
 	}
 
 	@Override public boolean isBeforeFirst() {
@@ -65,8 +80,9 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 			&& influxDbResultSet.getCurrentResult()
 			.map(QueryResult.Result::getSeries)
 			.map(List::size)
-			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() >= s)
-			.isPresent() && influxDbResultSet.getResultPosition().intValue() >= influxDbResultSet.getResults().size();
+			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() >= s - 1)
+			.isPresent()
+			&& influxDbResultSet.getResultPosition().intValue() >= influxDbResultSet.getResults().size() - 1;
 	}
 
 	@Override public boolean isFirst() {
@@ -95,6 +111,7 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 		influxDbResultSet.getSeriesPosition().set(influxDbResultSet.getCurrentResult()
 			.map(QueryResult.Result::getSeries)
 			.map(List::size)
+			.map(s -> s - 1)
 			.orElse(0));
 		influxDbResultSet.getResultPosition().set(influxDbResultSet.getResults().size() - 1);
 	}
@@ -102,12 +119,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	@Override public boolean first() {
 		influxDbResultSet.getResultPosition().set(0);
 		influxDbResultSet.getSeriesPosition().set(0);
-		if (influxDbResultSet.getCurrentRows().isEmpty()) {
-			return false;
-		} else {
-			influxDbResultSet.getRowPosition().set(0);
-			return true;
-		}
+		influxDbResultSet.getRowPosition().set(0);
+		return !influxDbResultSet.getCurrentRows().isEmpty();
 	}
 
 	@Override public boolean last() {
@@ -117,12 +130,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 			.map(List::size)
 			.map(s -> s - 1)
 			.orElse(0));
-		if (influxDbResultSet.getCurrentRows().isEmpty()) {
-			return false;
-		} else {
-			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
-			return true;
-		}
+		influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
+		return !influxDbResultSet.getCurrentRows().isEmpty();
 	}
 
 	@Override public int getRow() {
@@ -167,7 +176,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 			influxDbResultSet.getSeriesPosition().set(influxDbResultSet.getCurrentResult()
 				.map(QueryResult.Result::getSeries)
 				.map(List::size)
-				.orElse(0) - 1);
+				.map(s -> s - 1)
+				.orElse(0));
 			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
 		}
 		return !isBeforeFirst();

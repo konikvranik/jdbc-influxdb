@@ -25,8 +25,10 @@ import java.util.function.Function;
 
 import org.influxdb.dto.QueryResult;
 
+import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
+@Log
 public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDbMultiResultSet {
 	protected final InfluxDbStatement statement;
 
@@ -35,13 +37,16 @@ public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDb
 		this.statement = statement;
 	}
 
-	public  <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
-		getCurrentSeries();
+	public <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
+		log.fine(() -> String.format("Getting value at #%s", index));
 		Object obj = getCurrentRow().get(index - 1);
 		if (clzz.isInstance(obj)) {
+			log.fine(() -> String.format("Getting value %s", obj));
 			return (U) obj;
 		} else {
-			return convert.apply(obj);
+			U apply = convert.apply(obj);
+			log.fine(() -> String.format("Getting value %s", apply));
+			return apply;
 		}
 	}
 

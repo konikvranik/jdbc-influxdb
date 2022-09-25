@@ -11,9 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
+@Log
 public abstract class AbstractInfluxDbStatement implements Statement {
 	protected final InfluxDbConnection influxDbConnection;
 	protected final InfluxDB client;
@@ -28,7 +30,9 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 	@Getter @Setter private int maxFieldSize;
 	@Getter @Setter private boolean poolable;
 	@Getter private boolean closeOnCompletion;
-	@Getter private int resultSetHoldability;
+	@Getter private final int resultSetHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
+	@Getter private final int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
+	@Getter private final int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
 
 	public AbstractInfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {
 		this.influxDbConnection = influxDbConnection;
@@ -61,19 +65,14 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 	}
 
 	@Override public int getUpdateCount() {
-		return resultSet.getCurrentRows().size();
+		return -1;
+		//return getResultSet().getCurrentRows().size();
 	}
 
 	@Override public boolean getMoreResults() {
-		return resultSet.getMoreResults();
-	}
-
-	@Override public int getResultSetConcurrency() {
-		return ResultSet.CONCUR_READ_ONLY;
-	}
-
-	@Override public int getResultSetType() {
-		return ResultSet.TYPE_SCROLL_INSENSITIVE;
+		boolean moreResults = getResultSet().getMoreResults();
+		log.fine(() -> String.format("getMoreResults() is %s", moreResults));
+		return moreResults;
 	}
 
 	@Override public Connection getConnection() {

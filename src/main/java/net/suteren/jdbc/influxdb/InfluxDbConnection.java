@@ -22,11 +22,11 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.statement.InfluxDbPreparedStatement;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
-@Slf4j
+@Log
 public class InfluxDbConnection implements Connection {
 
 	private final InfluxDB influxDbClient;
@@ -56,11 +56,10 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public String nativeSQL(String sql) {
-		log.debug("NativeSQL: {}", sql);
+		log.fine(() -> String.format("NativeSQL: %s", sql));
 		if (Pattern.matches("^\\s*select\\s+'keep alive'\\s*$", sql)) {
 			return "";
 		}
-		;
 		return sql;
 	}
 

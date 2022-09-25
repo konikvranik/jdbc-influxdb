@@ -18,6 +18,7 @@ import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
@@ -61,6 +62,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 			assertEquals("test", r.getString(1));
 			assertEquals("test", r.getString("name"));
 			assertEquals("test", r.getString("NAME"));
+			assertFalse(r.getStatement().getMoreResults());
 		}
 
 	}
@@ -73,18 +75,13 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 	}
 
 	private static void assertConnectionMetadata(DatabaseMetaData metaData) throws SQLException {
-		ResultSet schemas = metaData.getSchemas();
-		while (schemas.next()) {
-			assertEquals("test", schemas.getString("table_schem"));
-			schemas.getString("table_catalog");
-		}
-
 		ResultSet tables = metaData.getTables(null, null, null, null);
-		while(tables.next()) {
+		while (tables.next()) {
 			tables.getString(1);
 			tables.getString(2);
 			tables.getString(3);
 			tables.getString(4);
 		}
+		assertFalse(tables.getStatement().getMoreResults());
 	}
 }

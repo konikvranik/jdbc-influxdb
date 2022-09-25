@@ -8,6 +8,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.influxdb.dto.QueryResult;
 
+import lombok.extern.java.Log;
+
+@Log
 public abstract class AbstractInfluxDbMultiResultSet
 	extends net.suteren.jdbc.AbstractBaseResultSet {
 	private final List<QueryResult.Result> results;
@@ -29,7 +32,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 			.isPresent()) {
 			seriesPosition.incrementAndGet();
 			return true;
-		} else if (results.size() > resultPosition.intValue() + 1) {
+		} else if (resultPosition.intValue() + 1 < results.size()) {
 			resultPosition.incrementAndGet();
 			seriesPosition.set(0);
 			return true;
@@ -60,6 +63,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public boolean next() {
+		log.fine("Next row.");
 		if (rowPosition.intValue() < getCurrentRows().size()) {
 			rowPosition.addAndGet(1);
 		}

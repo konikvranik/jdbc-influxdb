@@ -105,7 +105,8 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 		if (currentRows.isEmpty()) {
 			return null;
 		} else {
-			return currentRows.get(0).get(column - 1).getClass().getName();
+			Object o = currentRows.get(0).get(column - 1);
+			return o == null ? null : o.getClass().getName();
 		}
 	}
 

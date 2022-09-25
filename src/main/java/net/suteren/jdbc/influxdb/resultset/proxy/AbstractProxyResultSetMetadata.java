@@ -1,6 +1,7 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 import lombok.Getter;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSetMetaData;
@@ -78,12 +79,22 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 		return influxDbResultSetMetaData.getCatalogName(abstractProxyResultSet.remapIndex(column));
 	}
 
-	@Override public int getColumnType(int column) {
-		return influxDbResultSetMetaData.getColumnType(abstractProxyResultSet.remapIndex(column));
+	@Override public int getColumnType(int column) throws SQLException {
+		int index = abstractProxyResultSet.remapIndex(column);
+		if (abstractProxyResultSet.getMetaData().getColumnCount() >= index && index > 0) {
+			return influxDbResultSetMetaData.getColumnType(index);
+		} else {
+			return 0;
+		}
 	}
 
-	@Override public String getColumnTypeName(int column) {
-		return influxDbResultSetMetaData.getColumnTypeName(abstractProxyResultSet.remapIndex(column));
+	@Override public String getColumnTypeName(int column) throws SQLException {
+		int index = abstractProxyResultSet.remapIndex(column);
+		if (abstractProxyResultSet.getMetaData().getColumnCount() >= index && index > 0) {
+			return influxDbResultSetMetaData.getColumnTypeName(index);
+		} else {
+			return "";
+		}
 	}
 
 	@Override public boolean isReadOnly(int column) {

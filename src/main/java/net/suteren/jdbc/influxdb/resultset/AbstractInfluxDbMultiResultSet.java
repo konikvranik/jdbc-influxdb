@@ -22,10 +22,14 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	public boolean getMoreResults() {
-		if (results.get(resultPosition.get()).getSeries().size() > seriesPosition.get()) {
+		if (getCurrentResult()
+			.map(QueryResult.Result::getSeries)
+			.map(List::size)
+			.filter(s -> seriesPosition.intValue() + 1 < s)
+			.isPresent()) {
 			seriesPosition.incrementAndGet();
 			return true;
-		} else if (results.size() > resultPosition.get()) {
+		} else if (results.size() > resultPosition.intValue() + 1) {
 			resultPosition.incrementAndGet();
 			seriesPosition.set(0);
 			return true;
@@ -36,32 +40,30 @@ public abstract class AbstractInfluxDbMultiResultSet
 
 	public Optional<QueryResult.Result> getCurrentResult() {
 		return Optional.ofNullable(results)
-			.map(r -> r.get(resultPosition.get()));
+			.map(r -> r.get(resultPosition.intValue()));
 	}
 
 	public Optional<QueryResult.Series> getCurrentSeries() {
 		return getCurrentResult()
 			.map(QueryResult.Result::getSeries)
-			.map(s -> s.get(seriesPosition.get()));
+			.map(s -> s.get(seriesPosition.intValue()));
 	}
 
-	public List<List<Object>> getCurrentValues() {
+	public List<List<Object>> getCurrentRows() {
 		return getCurrentSeries()
 			.map(QueryResult.Series::getValues)
 			.orElse(List.of());
 	}
 
 	public List<Object> getCurrentRow() {
-		return getCurrentValues().get(rowPosition.get());
+		return getCurrentRows().get(rowPosition.get());
 	}
 
 	@Override public boolean next() {
-		if (rowPosition.intValue() < getCurrentValues().size()) {
+		if (rowPosition.intValue() < getCurrentRows().size()) {
 			rowPosition.addAndGet(1);
-			return true;
-		} else {
-			return false;
 		}
+		return rowPosition.intValue() < getCurrentRows().size();
 	}
 
 	@Override public boolean isBeforeFirst() {
@@ -69,7 +71,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public boolean isAfterLast() {
-		return rowPosition.get() >= getCurrentValues().size();
+		return rowPosition.intValue() >= getCurrentRows().size();
 	}
 
 	@Override public boolean isFirst() {
@@ -77,7 +79,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public boolean isLast() {
-		return rowPosition.get() == getCurrentValues().size() - 1;
+		return rowPosition.get() == getCurrentRows().size() - 1;
 	}
 
 	@Override public void beforeFirst() {
@@ -85,11 +87,11 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public void afterLast() {
-		rowPosition.set(getCurrentValues().size());
+		rowPosition.set(getCurrentRows().size());
 	}
 
 	@Override public boolean first() {
-		if (getCurrentValues().isEmpty()) {
+		if (getCurrentRows().isEmpty()) {
 			return false;
 		} else {
 			rowPosition.set(0);
@@ -98,21 +100,21 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public boolean last() {
-		if (getCurrentValues().isEmpty()) {
+		if (getCurrentRows().isEmpty()) {
 			return false;
 		} else {
-			rowPosition.set(getCurrentValues().size() - 1);
+			rowPosition.set(getCurrentRows().size() - 1);
 			return true;
 		}
 	}
 
 	@Override public int getRow() {
-		return rowPosition.get();
+		return rowPosition.intValue() + 1;
 	}
 
 	@Override public boolean absolute(int row) {
 		if (row < 0) {
-			rowPosition.set(getCurrentValues().size() - row);
+			rowPosition.set(getCurrentRows().size() - row);
 			return !isBeforeFirst();
 		} else {
 			rowPosition.set(row - 1);
@@ -195,7 +197,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 	@Override public int findColumn(String columnLabel) throws SQLException {
 		return getCurrentSeries()
 			.map(QueryResult.Series::getColumns)
-			.map(c -> c.indexOf(columnLabel) + 1)
+			.map(c -> c.indexOf(columnLabel.toLowerCase()) + 1)
 			.orElseThrow(() -> new SQLException(String.format("No column named %s", columnLabel)));
 	}
 

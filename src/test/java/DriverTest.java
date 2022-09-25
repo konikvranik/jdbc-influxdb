@@ -1,4 +1,6 @@
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -15,6 +17,7 @@ import org.testcontainers.utility.DockerImageName;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
@@ -49,23 +52,39 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		try (InfluxDbConnection conn =
 			influxDbDriver.connect(String.format("jdbc:influxdb:%s?db=test", influxDbContainer.getUrl()), properties)) {
 			assertTrue(conn.isValid(1));
-			ResultSet schemas = conn.getMetaData().getSchemas();
-			schemas.next();
-			schemas.getString(1);
-			schemas.getString(2);
-			ResultSet tables = conn.getMetaData().getTables(null, null, null, null);
-			tables.next();
+			assertConnectionMetadata(conn.getMetaData());
+			ResultSet r = conn.createStatement().executeQuery("show databases");
+			assertResultMetadata(r.getMetaData());
+			assertTrue(r.isBeforeFirst());
+			assertTrue(r.first());
+			assertTrue(r.isFirst());
+			assertEquals("test", r.getString(1));
+			assertEquals("test", r.getString("name"));
+			assertEquals("test", r.getString("NAME"));
+		}
+
+	}
+
+	private static void assertResultMetadata(ResultSetMetaData metaData) throws SQLException {
+		assertEquals(1, metaData.getColumnCount());
+		assertEquals("name", metaData.getColumnName(1));
+		assertEquals("name", metaData.getColumnLabel(1));
+		assertEquals("databases", metaData.getTableName(1));
+	}
+
+	private static void assertConnectionMetadata(DatabaseMetaData metaData) throws SQLException {
+		ResultSet schemas = metaData.getSchemas();
+		while (schemas.next()) {
+			assertEquals("test", schemas.getString("table_schem"));
+			schemas.getString("table_catalog");
+		}
+
+		ResultSet tables = metaData.getTables(null, null, null, null);
+		while(tables.next()) {
 			tables.getString(1);
 			tables.getString(2);
 			tables.getString(3);
 			tables.getString(4);
-			ResultSet r = conn.createStatement().executeQuery("select * from measurement1");
-			int cc = r.getMetaData().getColumnCount();
-			assertTrue(r.isBeforeFirst());
-			assertTrue(r.first());
-			assertTrue(r.isFirst());
-			r.getTimestamp(1);
 		}
-
 	}
 }

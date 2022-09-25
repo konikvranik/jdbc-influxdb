@@ -524,7 +524,7 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	}
 
 	@Override public int findColumn(String columnLabel) throws SQLException {
-		int index = Arrays.asList(columns).indexOf(columnLabel);
+		int index = Arrays.asList(columns).indexOf(columnLabel.toUpperCase());
 		if (index < 0) {
 			throw new SQLException(String.format("No column named %s", columnLabel));
 		}

@@ -24,7 +24,7 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public boolean isCaseSensitive(int column) {
-		return false;
+		return true;
 	}
 
 	@Override public boolean isSearchable(int column) {
@@ -101,8 +101,12 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnClassName(int column) {
-		return influxDbResultSet.getCurrentValues().get(influxDbResultSet.rowPosition.get()).get(column).getClass()
-			.getName();
+		List<List<Object>> currentRows = influxDbResultSet.getCurrentRows();
+		if (currentRows.isEmpty()) {
+			return null;
+		} else {
+			return currentRows.get(0).get(column - 1).getClass().getName();
+		}
 	}
 
 	@Override public <T> T unwrap(Class<T> iface) {

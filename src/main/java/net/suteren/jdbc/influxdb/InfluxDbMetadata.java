@@ -7,6 +7,7 @@ import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
 import net.suteren.jdbc.influxdb.resultset.proxy.GetDatabaseResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetFieldKeysResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 
 public class InfluxDbMetadata implements DatabaseMetaData {
@@ -516,8 +517,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 		return new GetDatabaseResultSet(influxDbConnection);
 	}
 
-	@Override public ResultSet getCatalogs() {
-		return null;
+	@Override public ResultSet getCatalogs() throws SQLException {
+		return new GetDatabaseResultSet(influxDbConnection);
 	}
 
 	@Override public ResultSet getTableTypes() {
@@ -526,8 +527,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 
 	@Override
 	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
-		String columnNamePattern) {
-		return null;
+		String columnNamePattern) throws SQLException {
+		return new GetFieldKeysResultSet(influxDbConnection, tableNamePattern);
 	}
 
 	@Override

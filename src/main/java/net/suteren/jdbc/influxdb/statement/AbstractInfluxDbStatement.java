@@ -61,7 +61,7 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 	}
 
 	@Override public int getUpdateCount() {
-		return resultSet.getCurrentValues().size();
+		return resultSet.getCurrentRows().size();
 	}
 
 	@Override public boolean getMoreResults() {

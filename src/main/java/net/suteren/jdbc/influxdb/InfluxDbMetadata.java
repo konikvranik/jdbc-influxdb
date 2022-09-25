@@ -740,4 +740,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	@Override public boolean isWrapperFor(Class<?> iface) {
 		return false;
 	}
+
+	public InfluxDbDriver getDriver() {
+		return influxDbDriver;
+	}
 }

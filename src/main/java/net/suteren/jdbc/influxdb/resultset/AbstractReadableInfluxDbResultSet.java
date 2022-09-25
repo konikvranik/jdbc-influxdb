@@ -25,16 +25,15 @@ import java.util.function.Function;
 
 import org.influxdb.dto.QueryResult;
 
-import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
-@Log
 public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDbMultiResultSet {
 	protected final InfluxDbStatement statement;
 
 	public AbstractReadableInfluxDbResultSet(List<QueryResult.Result> results, InfluxDbStatement statement) {
 		super(results);
 		this.statement = statement;
+		log = statement.getConnection().getMetaData().getDriver().getParentLogger();
 	}
 
 	public <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {

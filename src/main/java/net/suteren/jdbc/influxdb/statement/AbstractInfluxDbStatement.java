@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 import org.influxdb.InfluxDB;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +16,10 @@ import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
-@Log
 public abstract class AbstractInfluxDbStatement implements Statement {
 	protected final InfluxDbConnection influxDbConnection;
 	protected final InfluxDB client;
+	protected final Logger log;
 	protected SQLWarning error;
 	protected InfluxDbResultSet resultSet;
 	@Setter boolean escapeProcessing;
@@ -37,6 +38,7 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 	public AbstractInfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {
 		this.influxDbConnection = influxDbConnection;
 		this.client = client;
+		log = influxDbConnection.getMetaData().getDriver().getParentLogger();
 	}
 
 	@Override public void close() {
@@ -75,7 +77,7 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 		return moreResults;
 	}
 
-	@Override public Connection getConnection() {
+	@Override public InfluxDbConnection getConnection() {
 		return influxDbConnection;
 	}
 

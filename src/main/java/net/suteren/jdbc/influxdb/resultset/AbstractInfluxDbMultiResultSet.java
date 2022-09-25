@@ -5,12 +5,12 @@ import java.sql.SQLWarning;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import org.influxdb.dto.QueryResult;
 
 import lombok.extern.java.Log;
 
-@Log
 public abstract class AbstractInfluxDbMultiResultSet
 	extends net.suteren.jdbc.AbstractBaseResultSet {
 	private final List<QueryResult.Result> results;
@@ -19,6 +19,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 	final AtomicInteger rowPosition = new AtomicInteger(-1);
 	private boolean isClosed = false;
 	private String cursorName;
+	protected Logger log;
 
 	public AbstractInfluxDbMultiResultSet(List<QueryResult.Result> results) {
 		this.results = results;

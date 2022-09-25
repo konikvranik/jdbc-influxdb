@@ -5,7 +5,6 @@ import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.SQLWarning;
@@ -16,22 +15,22 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 
-import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.statement.InfluxDbPreparedStatement;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
-@Log
 public class InfluxDbConnection implements Connection {
 
 	private final InfluxDB influxDbClient;
-	private final DatabaseMetaData influxDbMetadata;
+	private final InfluxDbMetadata influxDbMetadata;
 	private boolean isClosed;
+	private Logger log;
 
 	public InfluxDbConnection(String url, String username, String password, String database,
 		InfluxDbDriver influxDbDriver) {
@@ -41,6 +40,7 @@ public class InfluxDbConnection implements Connection {
 			influxDbClient.setDatabase(database);
 		}
 		influxDbMetadata = new InfluxDbMetadata(url, username, influxDbClient.version(), influxDbDriver, this);
+		log = influxDbDriver.getParentLogger();
 	}
 
 	@Override public InfluxDbStatement createStatement() {
@@ -88,7 +88,7 @@ public class InfluxDbConnection implements Connection {
 		return isClosed;
 	}
 
-	@Override public DatabaseMetaData getMetaData() {
+	@Override public InfluxDbMetadata getMetaData() {
 		return influxDbMetadata;
 	}
 

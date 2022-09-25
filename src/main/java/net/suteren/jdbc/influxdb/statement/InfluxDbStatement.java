@@ -11,7 +11,6 @@ import lombok.extern.java.Log;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
-@Log
 public class InfluxDbStatement extends AbstractInfluxDbStatement {
 
 	public InfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {

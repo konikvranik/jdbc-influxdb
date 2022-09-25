@@ -5,9 +5,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 import net.suteren.jdbc.influxdb.resultset.proxy.GetFieldKeysResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetTagKeysResultSet;
 
 public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
@@ -15,6 +17,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String version;
 	private final InfluxDbDriver influxDbDriver;
 	private final InfluxDbConnection influxDbConnection;
+	private final static Pattern PERCENT_PATTERN = Pattern.compile("%");
 
 	public InfluxDbMetadata(String url, String userName, String version, InfluxDbDriver influxDbDriver,
 		InfluxDbConnection influxDbConnection) {
@@ -509,7 +512,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	@Override
 	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
 		throws SQLException {
-		return new GetTablesResultSet(influxDbConnection, tableNamePattern);
+		return new GetTablesResultSet(influxDbConnection,
+			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);
 	}
 
 	@Override public ResultSet getSchemas() {
@@ -527,7 +531,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	@Override
 	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
 		String columnNamePattern) throws SQLException {
-		return new GetFieldKeysResultSet(influxDbConnection, tableNamePattern);
+		return new GetFieldKeysResultSet(influxDbConnection,
+			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);
 	}
 
 	@Override
@@ -570,8 +575,10 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) {
-		return null;
+	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate)
+		throws SQLException {
+		return new GetTagKeysResultSet(influxDbConnection,
+			table == null || PERCENT_PATTERN.matcher(table).matches() ? null : table);
 	}
 
 	@Override public boolean supportsResultSetType(int type) {

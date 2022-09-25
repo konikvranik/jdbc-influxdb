@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.influxdb.InfluxDB;
@@ -30,7 +31,10 @@ public class InfluxDbConnection implements Connection {
 	private final InfluxDB influxDbClient;
 	private final InfluxDbMetadata influxDbMetadata;
 	private boolean isClosed;
-	private Logger log;
+	private final Logger log;
+	private static final Pattern KEEP_ALIVE_SQL_PATTERN = Pattern.compile("^\\s*select\\s+'keep alive'\\s*$");
+	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
+		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1");
 
 	public InfluxDbConnection(String url, String username, String password, String database,
 		InfluxDbDriver influxDbDriver) {
@@ -57,8 +61,12 @@ public class InfluxDbConnection implements Connection {
 
 	@Override public String nativeSQL(String sql) {
 		log.fine(() -> String.format("NativeSQL: %s", sql));
-		if (Pattern.matches("^\\s*select\\s+'keep alive'\\s*$", sql)) {
+		if (KEEP_ALIVE_SQL_PATTERN.matcher(sql).matches()) {
 			return "";
+		}
+		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
+		if (matcher.matches()) {
+			return matcher.replaceAll("SELECT $2 FROM $3");
 		}
 		return sql;
 	}

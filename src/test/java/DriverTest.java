@@ -78,46 +78,65 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 	private static void assertConnectionMetadata(DatabaseMetaData metaData) throws SQLException {
 		ResultSet tables = metaData.getTables(null, null, null, null);
 		while (tables.next()) {
-			tables.getString(1);
-			tables.getString(2);
-			tables.getString(3);
-			tables.getString(4);
+			assertTable(tables, "measurement1");
+		}
+		assertFalse(tables.getStatement().getMoreResults());
+		tables = metaData.getTables(null, null, "%", null);
+		while (tables.next()) {
+			assertTable(tables, "measurement1");
 		}
 		assertFalse(tables.getStatement().getMoreResults());
 
 		ResultSet columns = metaData.getColumns(null, null, null, null);
 		while (columns.next()) {
-
-			assertNull(columns.getString("TABLE_CAT"));
-			assertNull(columns.getString("TABLE_SCHEM"));
-			assertEquals("measurement1", columns.getString("TABLE_NAME"));
-			assertEquals("field1", columns.getString("COLUMN_NAME"));
-			assertEquals("integer", columns.getString("DATA_TYPE"));
-			assertEquals("integer", columns.getString("TYPE_NAME"));
-			assertNull(columns.getString("COLUMN_SIZE"));
-			assertNull(columns.getString("BUFFER_LENGTH"));
-			assertNull(columns.getString("DECIMAL_DIGITS"));
-			assertNull(columns.getString("NUM_PREC_RADIX"));
-			assertTrue(columns.getBoolean("NULLABLE"));
-			assertNull(columns.getString("REMARKS"));
-			assertNull(columns.getString("COLUMN_DEF"));
-			assertNull(columns.getString("SQL_DATA_TYPE"));
-			assertNull(columns.getString("SQL_DATETIME_SUB"));
-			assertNull(columns.getString("CHAR_OCTET_LENGTH"));
-			assertNull(columns.getString("ORDINAL_POSITION"));
-			assertTrue(columns.getBoolean("IS_NULLABLE"));
-			assertNull(columns.getString("SCOPE_CATALOG"));
-			assertNull(columns.getString("SCOPE_SCHEMA"));
-			assertEquals("measurement1", columns.getString("SCOPE_TABLE"));
-			assertEquals("integer", columns.getString("SOURCE_DATA_TYPE"));
-			assertNull(columns.getObject("IS_AUTOINCREMENT"));
-			assertNull(columns.getObject("IS_GENERATEDCOLUMN"));
-
-			columns.getString(1);
-			columns.getString(2);
-			columns.getString(3);
-			columns.getString(4);
+			assertField(columns, "measurement1", "field1", "integer");
 		}
 
+		columns = metaData.getColumns(null, null, "measurement1", null);
+		while (columns.next()) {
+			assertField(columns, "measurement1", "field1", "integer");
+		}
+
+	}
+
+	private static void assertTable(ResultSet tables, String tableName) throws SQLException {
+		assertNull(tables.getString("TABLE_CAT"));
+		assertNull(tables.getString("TABLE_SCHEM"));
+		assertEquals(tableName, tables.getString("TABLE_NAME"));
+		assertEquals("TABLE", tables.getString("TABLE_TYPE"));
+		assertNull(tables.getString("REMARKS"));
+		assertNull(tables.getString("TYPE_CAT"));
+		assertNull(tables.getString("TYPE_SCHEM"));
+		assertNull(tables.getString("TYPE_NAME"));
+		assertNull(tables.getString("SELF_REFERENCING_COL_NAME"));
+		assertNull(tables.getString("REF_GENERATION"));
+	}
+
+	private static void assertField(ResultSet columns, String measurementName, String fieldName, String type)
+		throws SQLException {
+		assertNull(columns.getString("TABLE_CAT"));
+		assertNull(columns.getString("TABLE_SCHEM"));
+		assertEquals(measurementName, columns.getString("TABLE_NAME"));
+		assertEquals(fieldName, columns.getString("COLUMN_NAME"));
+		assertEquals(type, columns.getString("DATA_TYPE"));
+		assertEquals(type, columns.getString("TYPE_NAME"));
+		assertNull(columns.getString("COLUMN_SIZE"));
+		assertNull(columns.getString("BUFFER_LENGTH"));
+		assertNull(columns.getString("DECIMAL_DIGITS"));
+		assertNull(columns.getString("NUM_PREC_RADIX"));
+		assertTrue(columns.getBoolean("NULLABLE"));
+		assertNull(columns.getString("REMARKS"));
+		assertNull(columns.getString("COLUMN_DEF"));
+		assertNull(columns.getString("SQL_DATA_TYPE"));
+		assertNull(columns.getString("SQL_DATETIME_SUB"));
+		assertNull(columns.getString("CHAR_OCTET_LENGTH"));
+		assertNull(columns.getString("ORDINAL_POSITION"));
+		assertTrue(columns.getBoolean("IS_NULLABLE"));
+		assertNull(columns.getString("SCOPE_CATALOG"));
+		assertNull(columns.getString("SCOPE_SCHEMA"));
+		assertEquals(measurementName, columns.getString("SCOPE_TABLE"));
+		assertEquals(type, columns.getString("SOURCE_DATA_TYPE"));
+		assertNull(columns.getObject("IS_AUTOINCREMENT"));
+		assertNull(columns.getObject("IS_GENERATEDCOLUMN"));
 	}
 }

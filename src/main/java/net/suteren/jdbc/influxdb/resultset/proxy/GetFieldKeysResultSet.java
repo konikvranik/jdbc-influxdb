@@ -21,7 +21,7 @@ public class GetFieldKeysResultSet extends AbstractProxyResultSet {
 
 	private static String getWithClause(String tableNamePattern) {
 		return tableNamePattern != null && !tableNamePattern.isBlank() ?
-			String.format(" WITH MEASUREMENT =~ /%s/", tableNamePattern) : "";
+			String.format(" FROM \"%s\"", tableNamePattern) : "";
 	}
 
 	@Override protected int remapIndex(int columnIndex) {

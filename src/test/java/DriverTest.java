@@ -51,6 +51,9 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 			assertTrue(conn.isValid(1));
 			ResultSet r = conn.createStatement().executeQuery("select * from measurement1");
 			int cc = r.getMetaData().getColumnCount();
+			r.first();
+			r.isFirst();
+			r.getString(1);
 		}
 
 	}

@@ -13,7 +13,6 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.NClob;
 import java.sql.Ref;
-import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
@@ -30,7 +29,7 @@ import java.util.function.Function;
 
 import org.influxdb.dto.QueryResult;
 
-public class InfluxDbResultSet implements ResultSet {
+public class InfluxDbResultSet extends net.suteren.jdbc.AbstractBaseResultSet  {
 	final QueryResult.Result result;
 	final AtomicInteger valuesPosition = new AtomicInteger(-1);
 	final AtomicInteger seriesPosition = new AtomicInteger(0);
@@ -41,6 +40,15 @@ public class InfluxDbResultSet implements ResultSet {
 	public InfluxDbResultSet(InfluxDbStatement statement) {
 		this.statement = statement;
 		this.result = statement.results.get(statement.resultPosition);
+	}
+
+	protected <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
+		Object obj = getValues().get(seriesPosition.get()).get(index - 1);
+		if (clzz.isInstance(obj)) {
+			return (U) obj;
+		} else {
+			return convert.apply(obj);
+		}
 	}
 
 	@Override public boolean next() {
@@ -130,79 +138,6 @@ public class InfluxDbResultSet implements ResultSet {
 			x -> new ByteArrayInputStream(String.valueOf(x).getBytes()));
 	}
 
-	@Override public String getString(String columnLabel) throws SQLException {
-		return getString(findColumn(columnLabel));
-	}
-
-	@Override public boolean getBoolean(String columnLabel) throws SQLException {
-		return getBoolean(findColumn(columnLabel));
-	}
-
-	@Override public byte getByte(String columnLabel) throws SQLException {
-		return getByte(findColumn(columnLabel));
-	}
-
-	@Override public short getShort(String columnLabel) throws SQLException {
-		return getShort(findColumn(columnLabel));
-	}
-
-	@Override public int getInt(String columnLabel) throws SQLException {
-		return getInt(findColumn(columnLabel));
-	}
-
-	@Override public long getLong(String columnLabel) throws SQLException {
-		return getLong(findColumn(columnLabel));
-	}
-
-	@Override public float getFloat(String columnLabel) throws SQLException {
-		return getFloat(findColumn(columnLabel));
-	}
-
-	@Override public double getDouble(String columnLabel) throws SQLException {
-		return getDouble(findColumn(columnLabel));
-	}
-
-	@Override public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
-		return getBigDecimal(findColumn(columnLabel), scale);
-	}
-
-	@Override public byte[] getBytes(String columnLabel) throws SQLException {
-		return getBytes(findColumn(columnLabel));
-	}
-
-	@Override public Date getDate(String columnLabel) throws SQLException {
-		return getDate(findColumn(columnLabel));
-	}
-
-	@Override public Time getTime(String columnLabel) throws SQLException {
-		return getTime(findColumn(columnLabel));
-	}
-
-	@Override public Timestamp getTimestamp(String columnLabel) throws SQLException {
-		return getTimestamp(findColumn(columnLabel));
-	}
-
-	@Override public InputStream getAsciiStream(String columnLabel) throws SQLException {
-		return getAsciiStream(findColumn(columnLabel));
-	}
-
-	@Override public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-		return getUnicodeStream(findColumn(columnLabel));
-	}
-
-	@Override public InputStream getBinaryStream(String columnLabel) throws SQLException {
-		return getBinaryStream(findColumn(columnLabel));
-	}
-
-	private <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) {
-		List<Object> obj = getValues().get(index - 1);
-		if (clzz.isInstance(obj)) {
-			return (U) obj;
-		} else {
-			return convert.apply(obj);
-		}
-	}
-
 	List<List<Object>> getValues() {
 		List<QueryResult.Series> series = this.result.getSeries();
 		if (series == null) {
@@ -232,32 +167,12 @@ public class InfluxDbResultSet implements ResultSet {
 		return getValue(columnIndex, Object.class, Function.identity());
 	}
 
-	@Override public Object getObject(String columnLabel) throws SQLException {
-		return getValue(findColumn(columnLabel), Object.class, Function.identity());
-	}
-
-	@Override public int findColumn(String columnLabel) throws SQLException {
-		List<QueryResult.Series> series = this.result.getSeries();
-		if (series == null) {
-			throw new SQLException(String.format("No columen named %s", columnLabel));
-		}
-		return series.get(seriesPosition.intValue()).getColumns().indexOf(columnLabel) + 1;
-	}
-
 	@Override public Reader getCharacterStream(int columnIndex) {
 		return new InputStreamReader(getUnicodeStream(columnIndex));
 	}
 
-	@Override public Reader getCharacterStream(String columnLabel) throws SQLException {
-		return new InputStreamReader(getUnicodeStream(columnLabel));
-	}
-
 	@Override public BigDecimal getBigDecimal(int columnIndex) {
 		return getValue(columnIndex, BigDecimal.class, x -> BigDecimal.valueOf(Double.parseDouble(String.valueOf(x))));
-	}
-
-	@Override public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-		return getBigDecimal(findColumn(columnLabel));
 	}
 
 	@Override public boolean isBeforeFirst() {
@@ -438,82 +353,6 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateNull(String columnLabel) {
-
-	}
-
-	@Override public void updateBoolean(String columnLabel, boolean x) {
-
-	}
-
-	@Override public void updateByte(String columnLabel, byte x) {
-
-	}
-
-	@Override public void updateShort(String columnLabel, short x) {
-
-	}
-
-	@Override public void updateInt(String columnLabel, int x) {
-
-	}
-
-	@Override public void updateLong(String columnLabel, long x) {
-
-	}
-
-	@Override public void updateFloat(String columnLabel, float x) {
-
-	}
-
-	@Override public void updateDouble(String columnLabel, double x) {
-
-	}
-
-	@Override public void updateBigDecimal(String columnLabel, BigDecimal x) {
-
-	}
-
-	@Override public void updateString(String columnLabel, String x) {
-
-	}
-
-	@Override public void updateBytes(String columnLabel, byte[] x) {
-
-	}
-
-	@Override public void updateDate(String columnLabel, Date x) {
-
-	}
-
-	@Override public void updateTime(String columnLabel, Time x) {
-
-	}
-
-	@Override public void updateTimestamp(String columnLabel, Timestamp x) {
-
-	}
-
-	@Override public void updateAsciiStream(String columnLabel, InputStream x, int length) {
-
-	}
-
-	@Override public void updateBinaryStream(String columnLabel, InputStream x, int length) {
-
-	}
-
-	@Override public void updateCharacterStream(String columnLabel, Reader reader, int length) {
-
-	}
-
-	@Override public void updateObject(String columnLabel, Object x, int scaleOrLength) {
-
-	}
-
-	@Override public void updateObject(String columnLabel, Object x) {
-
-	}
-
 	@Override public void insertRow() {
 
 	}
@@ -566,33 +405,9 @@ public class InfluxDbResultSet implements ResultSet {
 		return null;
 	}
 
-	@Override public Object getObject(String columnLabel, Map<String, Class<?>> map) {
-		return null;
-	}
-
-	@Override public Ref getRef(String columnLabel) {
-		return null;
-	}
-
-	@Override public Blob getBlob(String columnLabel) {
-		return null;
-	}
-
-	@Override public Clob getClob(String columnLabel) {
-		return null;
-	}
-
-	@Override public Array getArray(String columnLabel) {
-		return null;
-	}
-
 	@Override public Date getDate(int columnIndex, Calendar cal) {
 		cal.setTimeInMillis(getDate(columnIndex).getTime());
 		return new Date(cal.getTimeInMillis());
-	}
-
-	@Override public Date getDate(String columnLabel, Calendar cal) throws SQLException {
-		return getDate(findColumn(columnLabel), cal);
 	}
 
 	@Override public Time getTime(int columnIndex, Calendar cal) {
@@ -600,24 +415,12 @@ public class InfluxDbResultSet implements ResultSet {
 		return new Time(cal.getTimeInMillis());
 	}
 
-	@Override public Time getTime(String columnLabel, Calendar cal) throws SQLException {
-		return getTime(findColumn(columnLabel), cal);
-	}
-
 	@Override public Timestamp getTimestamp(int columnIndex, Calendar cal) {
 		cal.setTimeInMillis(getTimestamp(columnIndex).getTime());
 		return new Timestamp(cal.getTimeInMillis());
 	}
 
-	@Override public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
-		return getTimestamp(findColumn(columnLabel), cal);
-	}
-
 	@Override public URL getURL(int columnIndex) {
-		return null;
-	}
-
-	@Override public URL getURL(String columnLabel) {
 		return null;
 	}
 
@@ -625,15 +428,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateRef(String columnLabel, Ref x) {
-
-	}
-
 	@Override public void updateBlob(int columnIndex, Blob x) {
-
-	}
-
-	@Override public void updateBlob(String columnLabel, Blob x) {
 
 	}
 
@@ -641,15 +436,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateClob(String columnLabel, Clob x) {
-
-	}
-
 	@Override public void updateArray(int columnIndex, Array x) {
-
-	}
-
-	@Override public void updateArray(String columnLabel, Array x) {
 
 	}
 
@@ -657,15 +444,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return null;
 	}
 
-	@Override public RowId getRowId(String columnLabel) {
-		return null;
-	}
-
 	@Override public void updateRowId(int columnIndex, RowId x) {
-
-	}
-
-	@Override public void updateRowId(String columnLabel, RowId x) {
 
 	}
 
@@ -681,15 +460,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateNString(String columnLabel, String nString) {
-
-	}
-
 	@Override public void updateNClob(int columnIndex, NClob nClob) {
-
-	}
-
-	@Override public void updateNClob(String columnLabel, NClob nClob) {
 
 	}
 
@@ -697,15 +468,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return null;
 	}
 
-	@Override public NClob getNClob(String columnLabel) {
-		return null;
-	}
-
 	@Override public SQLXML getSQLXML(int columnIndex) {
-		return null;
-	}
-
-	@Override public SQLXML getSQLXML(String columnLabel) {
 		return null;
 	}
 
@@ -713,15 +476,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateSQLXML(String columnLabel, SQLXML xmlObject) {
-
-	}
-
 	@Override public String getNString(int columnIndex) {
-		return null;
-	}
-
-	@Override public String getNString(String columnLabel) {
 		return null;
 	}
 
@@ -729,15 +484,7 @@ public class InfluxDbResultSet implements ResultSet {
 		return null;
 	}
 
-	@Override public Reader getNCharacterStream(String columnLabel) {
-		return null;
-	}
-
 	@Override public void updateNCharacterStream(int columnIndex, Reader x, long length) {
-
-	}
-
-	@Override public void updateNCharacterStream(String columnLabel, Reader reader, long length) {
 
 	}
 
@@ -753,23 +500,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateAsciiStream(String columnLabel, InputStream x, long length) {
-
-	}
-
-	@Override public void updateBinaryStream(String columnLabel, InputStream x, long length) {
-
-	}
-
-	@Override public void updateCharacterStream(String columnLabel, Reader reader, long length) {
-
-	}
-
 	@Override public void updateBlob(int columnIndex, InputStream inputStream, long length) {
-
-	}
-
-	@Override public void updateBlob(String columnLabel, InputStream inputStream, long length) {
 
 	}
 
@@ -777,23 +508,11 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateClob(String columnLabel, Reader reader, long length) {
-
-	}
-
 	@Override public void updateNClob(int columnIndex, Reader reader, long length) {
 
 	}
 
-	@Override public void updateNClob(String columnLabel, Reader reader, long length) {
-
-	}
-
 	@Override public void updateNCharacterStream(int columnIndex, Reader x) {
-
-	}
-
-	@Override public void updateNCharacterStream(String columnLabel, Reader reader) {
 
 	}
 
@@ -809,23 +528,7 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateAsciiStream(String columnLabel, InputStream x) {
-
-	}
-
-	@Override public void updateBinaryStream(String columnLabel, InputStream x) {
-
-	}
-
-	@Override public void updateCharacterStream(String columnLabel, Reader reader) {
-
-	}
-
 	@Override public void updateBlob(int columnIndex, InputStream inputStream) {
-
-	}
-
-	@Override public void updateBlob(String columnLabel, InputStream inputStream) {
 
 	}
 
@@ -833,24 +536,12 @@ public class InfluxDbResultSet implements ResultSet {
 
 	}
 
-	@Override public void updateClob(String columnLabel, Reader reader) {
-
-	}
-
 	@Override public void updateNClob(int columnIndex, Reader reader) {
-
-	}
-
-	@Override public void updateNClob(String columnLabel, Reader reader) {
 
 	}
 
 	@Override public <T> T getObject(int columnIndex, Class<T> type) {
 		return null;
-	}
-
-	@Override public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-		return getObject(findColumn(columnLabel), type);
 	}
 
 	@Override public <T> T unwrap(Class<T> iface) {
@@ -859,5 +550,13 @@ public class InfluxDbResultSet implements ResultSet {
 
 	@Override public boolean isWrapperFor(Class<?> iface) {
 		return false;
+	}
+
+	@Override public int findColumn(String columnLabel) throws SQLException {
+		List<QueryResult.Series> series = this.result.getSeries();
+		if (series == null) {
+			throw new SQLException(String.format("No columen named %s", columnLabel));
+		}
+		return series.get(seriesPosition.intValue()).getColumns().indexOf(columnLabel) + 1;
 	}
 }

@@ -56,8 +56,8 @@ public abstract class AbstractInfluxDbMultiResultSet
 	}
 
 	@Override public boolean next() {
-		if (seriesPosition.intValue() < getCurrentValues().size()) {
-			seriesPosition.addAndGet(1);
+		if (rowPosition.intValue() < getCurrentValues().size()) {
+			rowPosition.addAndGet(1);
 			return true;
 		} else {
 			return false;

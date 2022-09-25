@@ -49,7 +49,16 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		try (InfluxDbConnection conn =
 			influxDbDriver.connect(String.format("jdbc:influxdb:%s?db=test", influxDbContainer.getUrl()), properties)) {
 			assertTrue(conn.isValid(1));
-			conn.getMetaData().getTables(null, null, null, null);
+			ResultSet schemas = conn.getMetaData().getSchemas();
+			schemas.next();
+			schemas.getString(1);
+			schemas.getString(2);
+			ResultSet tables = conn.getMetaData().getTables(null, null, null, null);
+			tables.next();
+			tables.getString(1);
+			tables.getString(2);
+			tables.getString(3);
+			tables.getString(4);
 			ResultSet r = conn.createStatement().executeQuery("select * from measurement1");
 			int cc = r.getMetaData().getColumnCount();
 			assertTrue(r.isBeforeFirst());

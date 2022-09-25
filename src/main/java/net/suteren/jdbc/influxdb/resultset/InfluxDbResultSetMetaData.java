@@ -101,7 +101,7 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnClassName(int column) {
-		return influxDbResultSet.getCurrentValues().get(influxDbResultSet.seriesPosition.get()).get(column).getClass()
+		return influxDbResultSet.getCurrentValues().get(influxDbResultSet.rowPosition.get()).get(column).getClass()
 			.getName();
 	}
 

@@ -132,7 +132,7 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	}
 
 	@Override public ResultSetMetaData getMetaData() {
-		return new AbstractProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, defaults.length);
+		return new AbstractProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns);
 	}
 
 	@Override public String getCursorName() {

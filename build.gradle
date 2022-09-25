@@ -3,6 +3,7 @@ plugins {
 	id 'io.freefair.lombok' version '6.5.1'
 }
 dependencies {
+	api 'org.slf4j:slf4j-api:2.0.1'
 	implementation "org.influxdb:influxdb-java:2.22"
 	testImplementation "org.testcontainers:influxdb:1.17.3"
 	testImplementation "ch.qos.logback:logback-classic:1.4.1"

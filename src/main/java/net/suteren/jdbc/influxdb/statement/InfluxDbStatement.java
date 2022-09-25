@@ -18,7 +18,7 @@ public class InfluxDbStatement extends AbstractInfluxDbStatement {
 
 	@Override public InfluxDbResultSet executeQuery(String sql) throws SQLException {
 		try {
-			QueryResult query = client.query(new Query(sql));
+			QueryResult query = client.query(new Query(getConnection().nativeSQL(sql)));
 			error = new SQLWarning(query.getError());
 			resultSet = new InfluxDbResultSet(this, query.getResults());
 			return resultSet;
@@ -34,6 +34,8 @@ public class InfluxDbStatement extends AbstractInfluxDbStatement {
 	@Override public boolean execute(String sql) throws SQLException {
 		try (InfluxDbResultSet r = executeQuery(sql)) {
 			return r.getCurrentValues().size() > 0;
+		} catch (Exception e) {
+			throw new SQLException(String.format("Execution of query '%s' failed", sql), e);
 		}
 	}
 

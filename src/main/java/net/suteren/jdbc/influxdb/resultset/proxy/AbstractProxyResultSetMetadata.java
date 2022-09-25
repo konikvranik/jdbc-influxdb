@@ -1,7 +1,6 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 
 import lombok.Getter;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSetMetaData;
@@ -10,13 +9,17 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 
 	private final InfluxDbResultSetMetaData influxDbResultSetMetaData;
 	private final AbstractProxyResultSet abstractProxyResultSet;
-	@Getter private final int columnCount;
+	@Getter private final String[] columns;
 
 	public AbstractProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
-		AbstractProxyResultSet abstractProxyResultSet, int columnCount) {
+		AbstractProxyResultSet abstractProxyResultSet, String[] columns) {
 		this.influxDbResultSetMetaData = influxDbResultSetMetaData;
 		this.abstractProxyResultSet = abstractProxyResultSet;
-		this.columnCount = columnCount;
+		this.columns = columns;
+	}
+
+	@Override public int getColumnCount() {
+		return columns.length;
 	}
 
 	@Override public boolean isAutoIncrement(int column) {
@@ -48,11 +51,11 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnLabel(int column) {
-		return influxDbResultSetMetaData.getColumnLabel(abstractProxyResultSet.remapIndex(column));
+		return getColumnName(column);
 	}
 
 	@Override public String getColumnName(int column) {
-		return influxDbResultSetMetaData.getColumnName(abstractProxyResultSet.remapIndex(column));
+		return columns[column - 1];
 	}
 
 	@Override public String getSchemaName(int column) {

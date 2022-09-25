@@ -9,16 +9,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.influxdb.dto.QueryResult;
 
-public abstract class InfluxDbMultiResultSet
+public abstract class AbstractInfluxDbMultiResultSet
 	extends net.suteren.jdbc.AbstractBaseResultSet {
 	private final List<QueryResult.Result> results;
 	private final AtomicInteger resultPosition = new AtomicInteger(0);
 	final AtomicInteger seriesPosition = new AtomicInteger(0);
 	final AtomicInteger rowPosition = new AtomicInteger(-1);
-	protected boolean isClosed = false;
+	private boolean isClosed = false;
 	private String cursorName;
 
-	public InfluxDbMultiResultSet(List<QueryResult.Result> results) {
+	public AbstractInfluxDbMultiResultSet(List<QueryResult.Result> results) {
 		this.results = results;
 	}
 
@@ -198,5 +198,13 @@ public abstract class InfluxDbMultiResultSet
 			.map(QueryResult.Series::getColumns)
 			.map(c -> c.indexOf(columnLabel) + 1)
 			.orElseThrow(() -> new SQLException(String.format("No column named %s", columnLabel)));
+	}
+
+	@Override public boolean isClosed() {
+		return isClosed;
+	}
+
+	@Override public int getHoldability() {
+		return HOLD_CURSORS_OVER_COMMIT;
 	}
 }

@@ -6,9 +6,9 @@ import java.util.List;
 import org.influxdb.dto.QueryResult;
 
 public class InfluxDbResultSetMetaData implements ResultSetMetaData {
-	private final InfluxDbMultiResultSet influxDbResultSet;
+	private final AbstractInfluxDbMultiResultSet influxDbResultSet;
 
-	public InfluxDbResultSetMetaData(InfluxDbMultiResultSet influxDbResultSet) {
+	public InfluxDbResultSetMetaData(AbstractInfluxDbMultiResultSet influxDbResultSet) {
 		this.influxDbResultSet = influxDbResultSet;
 	}
 

@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 import org.influxdb.dto.QueryResult;
 
-import net.suteren.jdbc.influxdb.InfluxDbStatement;
+import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
 public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDbMultiResultSet {
 	protected final InfluxDbStatement statement;

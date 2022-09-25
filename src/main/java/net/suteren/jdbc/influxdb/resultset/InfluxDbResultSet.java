@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.influxdb.dto.QueryResult;
 
-import net.suteren.jdbc.influxdb.InfluxDbStatement;
+import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
 public class InfluxDbResultSet extends AbstractReadableInfluxDbResultSet {
 

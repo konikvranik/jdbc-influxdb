@@ -46,7 +46,7 @@ public abstract class AbstractInfluxDbMultiResultSet
 			.map(s -> s.get(seriesPosition.get()));
 	}
 
-	protected List<List<Object>> getCurrentValues() {
+	public List<List<Object>> getCurrentValues() {
 		return getCurrentSeries()
 			.map(QueryResult.Series::getValues)
 			.orElse(List.of());

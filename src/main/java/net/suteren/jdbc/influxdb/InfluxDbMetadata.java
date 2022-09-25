@@ -7,14 +7,17 @@ import java.sql.RowIdLifetime;
 
 public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
-	private String userName;
+	private final String userName;
 	private final String version;
+	private final InfluxDbDriver influxDbDriver;
 	private final InfluxDbConnection influxDbConnection;
 
-	public InfluxDbMetadata(String url, String userName, String version, InfluxDbConnection influxDbConnection) {
+	public InfluxDbMetadata(String url, String userName, String version, InfluxDbDriver influxDbDriver,
+		InfluxDbConnection influxDbConnection) {
 		this.url = url;
 		this.userName = userName;
 		this.version = version;
+		this.influxDbDriver = influxDbDriver;
 		this.influxDbConnection = influxDbConnection;
 	}
 
@@ -71,11 +74,11 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public int getDriverMajorVersion() {
-		return influxDbConnection.influxDbDriver.getMajorVersion();
+		return influxDbDriver.getMajorVersion();
 	}
 
 	@Override public int getDriverMinorVersion() {
-		return influxDbConnection.influxDbDriver.getMinorVersion();
+		return influxDbDriver.getMinorVersion();
 	}
 
 	@Override public boolean usesLocalFiles() {

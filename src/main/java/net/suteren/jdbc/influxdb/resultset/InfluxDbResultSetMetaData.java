@@ -59,7 +59,7 @@ public class InfluxDbResultSetMetaData implements ResultSetMetaData {
 	}
 
 	@Override public String getSchemaName(int column) {
-		return "";
+		return "default";
 	}
 
 	@Override public int getPrecision(int column) {

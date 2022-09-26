@@ -5,17 +5,26 @@ import java.sql.ResultSetMetaData;
 import lombok.Getter;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSetMetaData;
 
-public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
+public class ProxyResultSetMetadata implements ResultSetMetaData {
 
 	private final InfluxDbResultSetMetaData influxDbResultSetMetaData;
 	private final AbstractProxyResultSet abstractProxyResultSet;
+	private final String catalog;
+	private final String schema;
 	@Getter private final String[] columns;
 
-	public AbstractProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
+	public ProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
 		AbstractProxyResultSet abstractProxyResultSet, String[] columns) {
+		this(influxDbResultSetMetaData, abstractProxyResultSet, columns, null, null);
+	}
+
+	public ProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
+		AbstractProxyResultSet abstractProxyResultSet, String[] columns, String catalog, String schema) {
 		this.influxDbResultSetMetaData = influxDbResultSetMetaData;
 		this.abstractProxyResultSet = abstractProxyResultSet;
 		this.columns = columns;
+		this.catalog = catalog;
+		this.schema = schema;
 	}
 
 	@Override public int getColumnCount() {
@@ -59,7 +68,9 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 	}
 
 	@Override public String getSchemaName(int column) {
-		return influxDbResultSetMetaData.getSchemaName(abstractProxyResultSet.remapIndex(column));
+		return schema == null ?
+			influxDbResultSetMetaData.getSchemaName(abstractProxyResultSet.remapIndex(column)) :
+			schema;
 	}
 
 	@Override public int getPrecision(int column) {
@@ -75,7 +86,9 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 	}
 
 	@Override public String getCatalogName(int column) {
-		return influxDbResultSetMetaData.getCatalogName(abstractProxyResultSet.remapIndex(column));
+		return catalog == null ?
+			influxDbResultSetMetaData.getCatalogName(abstractProxyResultSet.remapIndex(column)) :
+			catalog;
 	}
 
 	@Override public int getColumnType(int column) {

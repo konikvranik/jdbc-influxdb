@@ -37,12 +37,21 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	private final Object[] defaults;
 	private final InfluxDbResultSet influxDbResultSet;
 	private final Logger log;
+	private final String catalog;
+	private final String schema;
 
 	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
+		this(influxDbResultSet, columns, defaults, null, null);
+	}
+
+	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults,
+		String catalog, String schema) {
 		this.influxDbResultSet = influxDbResultSet;
 		this.columns = columns;
 		this.defaults = defaults;
 		log = influxDbResultSet.getStatement().getConnection().getMetaData().getDriver().getParentLogger();
+		this.catalog = catalog;
+		this.schema = schema;
 	}
 
 	@Override public boolean next() {
@@ -225,8 +234,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 		influxDbResultSet.clearWarnings();
 	}
 
-	@Override public AbstractProxyResultSetMetadata getMetaData() {
-		return new AbstractProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns);
+	@Override public ProxyResultSetMetadata getMetaData() {
+		return new ProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns, catalog, schema);
 	}
 
 	@Override public String getCursorName() {

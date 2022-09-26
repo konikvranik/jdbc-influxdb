@@ -6,10 +6,13 @@ import java.util.function.Function;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 
-public class GetFieldKeysResultSet extends AbstractProxyResultSet {
-	public GetFieldKeysResultSet(InfluxDbConnection influxDbConnection, String tableNamePattern) throws SQLException {
+public class GetColumnResultSet extends AbstractProxyResultSet {
+	public GetColumnResultSet(InfluxDbConnection influxDbConnection, String tableNamePattern, String catalog)
+		throws SQLException {
 		super(influxDbConnection.createStatement()
-				.executeQuery(String.format("SHOW FIELD KEYS%1$s; SHOW TAG KEYS%1$s", getWithClause(tableNamePattern))),
+				.executeQuery(String.format("SHOW FIELD KEYS%1$s%2$s; SHOW TAG KEYS%1$s%2$s",
+					catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "",
+					getWithClause(tableNamePattern))),
 			new String[] { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "TYPE_NAME",
 				"COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX", "NULLABLE", "REMARKS", "COLUMN_DEF",
 				"SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION", "IS_NULLABLE",

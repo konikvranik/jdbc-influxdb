@@ -8,9 +8,11 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import net.suteren.jdbc.influxdb.resultset.proxy.AbstractProxyResultSet;
-import net.suteren.jdbc.influxdb.resultset.proxy.GetFieldKeysResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetCatalogResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetColumnResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetIndexResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetSchemaResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
-import net.suteren.jdbc.influxdb.resultset.proxy.GetTagKeysResultSet;
 
 public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
@@ -278,7 +280,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getCatalogTerm() {
-		return "";
+		return "database";
 	}
 
 	@Override public boolean isCatalogAtStart() {
@@ -514,15 +516,16 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	public GetTablesResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
 		throws SQLException {
 		return new GetTablesResultSet(influxDbConnection,
-			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);
+			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern,
+			catalog);
 	}
 
-	@Override public ResultSet getSchemas() {
-		return null;
+	@Override public GetSchemaResultSet getSchemas() throws SQLException {
+		return getSchemas(null, null);
 	}
 
-	@Override public ResultSet getCatalogs() {
-		return null;
+	@Override public GetCatalogResultSet getCatalogs() throws SQLException {
+		return new GetCatalogResultSet(influxDbConnection);
 	}
 
 	@Override public ResultSet getTableTypes() {
@@ -532,8 +535,9 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	@Override
 	public AbstractProxyResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
 		String columnNamePattern) throws SQLException {
-		return new GetFieldKeysResultSet(influxDbConnection,
-			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);
+		return new GetColumnResultSet(influxDbConnection,
+			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern,
+			catalog);
 	}
 
 	@Override
@@ -578,7 +582,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	@Override
 	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate)
 		throws SQLException {
-		return new GetTagKeysResultSet(influxDbConnection,
+		return new GetIndexResultSet(influxDbConnection,
 			table == null || PERCENT_PATTERN.matcher(table).matches() ? null : table);
 	}
 
@@ -707,8 +711,8 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 		return null;
 	}
 
-	@Override public ResultSet getSchemas(String catalog, String schemaPattern) {
-		return null;
+	@Override public GetSchemaResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+		return null; //TODO: new GetSchemaResultSet(influxDbConnection, catalog, schemaPattern);
 	}
 
 	@Override public boolean supportsStoredFunctionsUsingCallSyntax() {

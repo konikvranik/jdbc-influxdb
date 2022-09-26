@@ -6,8 +6,8 @@ import java.util.function.Function;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 
-public class GetTagKeysResultSet extends AbstractProxyResultSet {
-	public GetTagKeysResultSet(InfluxDbConnection influxDbConnection, String tableNamePattern) throws SQLException {
+public class GetIndexResultSet extends AbstractProxyResultSet {
+	public GetIndexResultSet(InfluxDbConnection influxDbConnection, String tableNamePattern) throws SQLException {
 		super(influxDbConnection.createStatement()
 				.executeQuery(String.format(" SHOW TAG KEYS%1$s", getWithClause(tableNamePattern))),
 			new String[] { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "NON_UNIQUE", "INDEX_QUALIFIER", "INDEX_NAME",

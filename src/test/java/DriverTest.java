@@ -20,6 +20,8 @@ import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 import net.suteren.jdbc.influxdb.InfluxDbMetadata;
 import net.suteren.jdbc.influxdb.resultset.proxy.AbstractProxyResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetCatalogResultSet;
+import net.suteren.jdbc.influxdb.resultset.proxy.GetSchemaResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +34,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 	public static final String USERNAME = "admin";
 	private static final String PASSWORD = "password";
 	public static final String DATABASE = "test";
+	public static final String DATABASE1 = "test1";
 	@Rule public InfluxDBContainer<SELF> influxDbContainer =
 		new InfluxDBContainer<>(DockerImageName.parse("influxdb:1.8"));
 	private InfluxDB influxDB;
@@ -40,6 +43,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 	public void setUp() {
 		influxDB = influxDbContainer.withUsername(USERNAME).withPassword(PASSWORD).getNewInfluxDB();
 		influxDB.query(new Query(String.format("CREATE DATABASE %s;", DATABASE)));
+		influxDB.query(new Query(String.format("CREATE DATABASE %s;", DATABASE1)));
 		influxDB.setDatabase(DATABASE);
 		influxDB.write(Point.measurement("measurement1").addField("field1", 13).tag("tag1", "tag1value").build());
 		influxDB.write(Point.measurement("measurement1").addField("field2", 13).tag("tag2", "tag2value").build());
@@ -85,6 +89,64 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 	}
 
 	private static void assertConnectionMetadata(InfluxDbMetadata metaData) throws SQLException {
+		assertCatalogs(metaData);
+		assertSchemas(metaData);
+		assertTables(metaData);
+		assertColumns(metaData);
+	}
+
+	private static void assertCatalogs(InfluxDbMetadata metaData) throws SQLException {
+		GetCatalogResultSet catalogs = metaData.getCatalogs();
+		assertTrue(catalogs.isBeforeFirst());
+		assertFalse(catalogs.isFirst());
+		assertFalse(catalogs.isLast());
+		assertFalse(catalogs.isAfterLast());
+		Iterator<String> tableNames = List.of(DATABASE, DATABASE1).iterator();
+		while (catalogs.next()) {
+			assertCatalog(catalogs, tableNames.next());
+		}
+		assertFalse(catalogs.isBeforeFirst());
+		assertFalse(catalogs.isFirst());
+		assertFalse(catalogs.isLast());
+		assertTrue(catalogs.isAfterLast());
+
+		assertFalse(catalogs.getStatement().getMoreResults());
+	}
+
+	private static void assertSchemas(InfluxDbMetadata metaData) throws SQLException {
+		GetSchemaResultSet schemas = metaData.getSchemas();
+		assertTrue(schemas.isBeforeFirst());
+		assertFalse(schemas.isFirst());
+		assertFalse(schemas.isLast());
+		assertFalse(schemas.isAfterLast());
+		Iterator<String> tableNames = List.of(DATABASE, DATABASE1).iterator();
+		while (schemas.next()) {
+			assertSchema(schemas, tableNames.next());
+		}
+		assertFalse(schemas.isBeforeFirst());
+		assertFalse(schemas.isFirst());
+		assertFalse(schemas.isLast());
+		assertTrue(schemas.isAfterLast());
+
+		assertFalse(schemas.getStatement().getMoreResults());
+
+		schemas = metaData.getSchemas(DATABASE, null);
+		assertTrue(schemas.isBeforeFirst());
+		assertFalse(schemas.isFirst());
+		assertFalse(schemas.isLast());
+		assertFalse(schemas.isAfterLast());
+		tableNames = List.of(DATABASE).iterator();
+		while (schemas.next()) {
+			assertSchema(schemas, tableNames.next());
+		}
+		assertFalse(schemas.isBeforeFirst());
+		assertFalse(schemas.isFirst());
+		assertFalse(schemas.isLast());
+		assertTrue(schemas.isAfterLast());
+
+	}
+
+	private static void assertTables(InfluxDbMetadata metaData) throws SQLException {
 		GetTablesResultSet tables = metaData.getTables(null, null, null, null);
 		assertTrue(tables.isBeforeFirst());
 		assertFalse(tables.isFirst());
@@ -107,7 +169,9 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 			assertTable(tables, tableNames.next());
 		}
 		assertFalse(tables.getStatement().getMoreResults());
+	}
 
+	private static void assertColumns(InfluxDbMetadata metaData) throws SQLException {
 		AbstractProxyResultSet columns = metaData.getColumns(null, null, null, null);
 		Iterator<String[]> expectations = List.of(
 			new String[] { "measurement1", "field1", "integer" },
@@ -166,7 +230,15 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 			String[] ex = expectations.next();
 			assertField(columns, ex[0], ex[1], ex[2]);
 		}
+	}
 
+	private static void assertCatalog(GetCatalogResultSet catalogs, String next) throws SQLException {
+		assertEquals(next, catalogs.getString("TABLE_CAT"));
+	}
+
+	private static void assertSchema(GetSchemaResultSet schemas, String next) throws SQLException {
+		assertEquals(next, schemas.getString("TABLE_CATALOG"));
+		assertEquals("default", schemas.getString("TABLE_SCHEM"));
 	}
 
 	private static void assertTable(ResultSet tables, String tableName) throws SQLException {

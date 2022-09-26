@@ -276,4 +276,8 @@ public class InfluxDbConnection implements Connection {
 	@Override public boolean isWrapperFor(Class<?> iface) {
 		return false;
 	}
+
+	public InfluxDB getClient() {
+		return influxDbClient;
+	}
 }

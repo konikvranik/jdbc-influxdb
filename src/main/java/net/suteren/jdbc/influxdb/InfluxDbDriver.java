@@ -43,8 +43,7 @@ public class InfluxDbDriver implements java.sql.Driver {
 			} catch (MalformedURLException e) {
 				throw new SQLException(String.format("Invalid URL %s", url), e);
 			}
-			return new InfluxDbConnection(url,
-				username, password, database.get(), this);
+			return new InfluxDbConnection(url, username, password, database.get(), this);
 		} else {
 			throw new java.sql.SQLException(String.format("Invalid URL %s", url));
 		}

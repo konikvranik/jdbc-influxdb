@@ -17,16 +17,14 @@ import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String url;
 	private final String userName;
-	private final String version;
 	private final InfluxDbDriver influxDbDriver;
 	private final InfluxDbConnection influxDbConnection;
 	private final static Pattern PERCENT_PATTERN = Pattern.compile("%");
 
-	public InfluxDbMetadata(String url, String userName, String version, InfluxDbDriver influxDbDriver,
+	public InfluxDbMetadata(String url, String userName, InfluxDbDriver influxDbDriver,
 		InfluxDbConnection influxDbConnection) {
 		this.url = url;
 		this.userName = userName;
-		this.version = version;
 		this.influxDbDriver = influxDbDriver;
 		this.influxDbConnection = influxDbConnection;
 	}
@@ -72,7 +70,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getDatabaseProductVersion() {
-		return version;
+		return influxDbConnection.getClient().version();
 	}
 
 	@Override public String getDriverName() {
@@ -680,11 +678,11 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public int getDatabaseMajorVersion() {
-		return Integer.parseInt(version.split("\\.")[0]);
+		return Integer.parseInt(getDatabaseProductVersion().split("\\.")[0]);
 	}
 
 	@Override public int getDatabaseMinorVersion() {
-		return Integer.parseInt(version.split("\\.")[1]);
+		return Integer.parseInt(getDatabaseProductVersion().split("\\.")[1]);
 	}
 
 	@Override public int getJDBCMajorVersion() {

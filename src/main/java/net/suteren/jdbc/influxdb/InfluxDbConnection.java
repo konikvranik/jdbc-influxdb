@@ -33,13 +33,13 @@ public class InfluxDbConnection implements Connection {
 	private boolean isClosed;
 	private final Logger log;
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*", Pattern.CASE_INSENSITIVE);
+		Pattern.compile("^\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1.*",
+		Pattern.compile("^\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?(['\"]?)(\\S+)\\3(\\s.*)?$",
 			Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(?:\"?default\"?\\.(\\S+)(?:\\s*,\\s*)?)+\\s+FROM\\s+.*",
+		Pattern.compile("^\\s*SELECT\\s+(?:\"?default\"?\\.(\\S+)(?:\\s*,\\s*)?)+\\s+FROM\\s+.+$",
 			Pattern.CASE_INSENSITIVE);
 
 	public InfluxDbConnection(String url, String username, String password, String database,
@@ -73,7 +73,10 @@ public class InfluxDbConnection implements Connection {
 		}
 		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			sql = matcher.replaceAll("SELECT $2 FROM $3");
+			String alias = matcher.group(4);
+			sql = matcher.replaceFirst("select $1 from $2$5");
+			sql = sql.replaceAll(String.format("\\s+%s\\.", alias), " ")
+				.replaceAll(String.format("\\s+\"%s\"\\.", alias), " ");
 		}
 		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
 			sql = sql.replaceAll("\\s+\"?default\"?\\.", " ");

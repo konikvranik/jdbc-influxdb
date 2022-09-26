@@ -9,6 +9,7 @@ import org.influxdb.dto.QueryResult;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -18,6 +19,7 @@ import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -65,6 +67,15 @@ public class MockedTest {
 		connection.close();
 	}
 
+	@Test public void testSqlCleanup() throws SQLException {
+		InfluxDbStatement statement = connection.createStatement();
+		statement.execute("SELECT * FROM test t where t.a>0");
+		verify(influxDB, times(1)).query(any(Query.class));
+		verify(influxDB).query(argThat(queryMatches("select * from test where a>0")));
+		//verify(influxDB).query(eq(new Query("SELECT * FROM test")));
+		connection.close();
+	}
+
 	@Test public void testKeepAlive() throws SQLException {
 		InfluxDbStatement statement = connection.createStatement();
 		statement.execute("SELECT 'keep alive'");
@@ -73,4 +84,20 @@ public class MockedTest {
 		connection.close();
 	}
 
+	public static QueryMatcher queryMatches(String expected) {
+		return new QueryMatcher(expected);
+	}
+
+	private static class QueryMatcher implements ArgumentMatcher<Query> {
+		private final String expected;
+
+		public QueryMatcher(String expected) {
+			this.expected = expected;
+		}
+
+		@Override public boolean matches(Query argument) {
+			assertEquals(expected, argument.getCommand());
+			return true;
+		}
+	}
 }

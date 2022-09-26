@@ -1,7 +1,6 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.function.Function;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;

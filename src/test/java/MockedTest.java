@@ -69,9 +69,9 @@ public class MockedTest {
 
 	@Test public void testSqlCleanup() throws SQLException {
 		InfluxDbStatement statement = connection.createStatement();
-		statement.execute("SELECT * FROM test t where t.a>0");
+		statement.execute("SELECT t.* FROM jmeter t WHERE time >= '2022-09-26T00:00:00Z' and transaction ='internal' ORDER BY minAT");
 		verify(influxDB, times(1)).query(any(Query.class));
-		verify(influxDB).query(argThat(queryMatches("select * from test where a>0")));
+		verify(influxDB).query(argThat(queryMatches("select * from jmeter WHERE time >= '2022-09-26T00:00:00Z' and transaction ='internal' ORDER BY minAT")));
 		//verify(influxDB).query(eq(new Query("SELECT * FROM test")));
 		connection.close();
 	}

@@ -36,9 +36,9 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	private final String[] columns;
 	private final Object[] defaults;
 	private final InfluxDbResultSet influxDbResultSet;
-	private final Logger log;
 	private final String schema;
-	protected String catalog;
+	protected final String catalog;
+	protected final Logger log;
 
 	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
 		this(influxDbResultSet, columns, defaults, null, null);

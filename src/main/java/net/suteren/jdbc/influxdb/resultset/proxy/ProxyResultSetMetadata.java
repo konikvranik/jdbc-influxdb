@@ -14,11 +14,6 @@ public class ProxyResultSetMetadata implements ResultSetMetaData {
 	@Getter private final String[] columns;
 
 	public ProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
-		AbstractProxyResultSet abstractProxyResultSet, String[] columns) {
-		this(influxDbResultSetMetaData, abstractProxyResultSet, columns, null, null);
-	}
-
-	public ProxyResultSetMetadata(InfluxDbResultSetMetaData influxDbResultSetMetaData,
 		AbstractProxyResultSet abstractProxyResultSet, String[] columns, String catalog, String schema) {
 		this.influxDbResultSetMetaData = influxDbResultSetMetaData;
 		this.abstractProxyResultSet = abstractProxyResultSet;

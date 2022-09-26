@@ -9,7 +9,7 @@ import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
 public class GetSchemaResultSet extends AbstractProxyResultSet {
-	public GetSchemaResultSet(InfluxDbConnection influxDbConnection, String catalog, String schemaPattern)
+	public GetSchemaResultSet(InfluxDbConnection influxDbConnection, String catalog)
 		throws SQLException {
 		super(prepareResults(influxDbConnection, catalog),
 			new String[] { "TABLE_SCHEM", "TABLE_CATALOG" },

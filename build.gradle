@@ -13,12 +13,37 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:4.8.0'
 }
 
+ext.moduleName = 'InfluxDbSqlDriver'
+
+compileJava {
+	inputs.property('moduleName', moduleName)
+	doFirst {
+		options.compilerArgs = ['--module-path', classpath.asPath]
+	}
+}
+
 repositories {
 	jcenter()
+	mavenCentral()
 }
 java {
+	sourceCompatibility = "11"
+	targetCompatibility = "11"
 	withJavadocJar()
 	withSourcesJar()
+}
+
+javadoc {
+	inputs.property('moduleName', moduleName)
+	doFirst {
+		options.modulePath = [] + classpath.files
+		options.classpath = []
+	}
+	options {
+		//failOnError = false
+		encoding = 'UTF-8'
+		//addBooleanOption 'Xdoclint:all,-html,-accessibility,-reference', true
+	}
 }
 
 jar {
@@ -28,9 +53,33 @@ jar {
 	duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }
 
-project.publishing {
+repositories {
+	maven {
+		url = uri("https://maven.pkg.github.com/konikvranik/jdbc-influxdb")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+			password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+		}
+	}
+	mavenCentral()
+}
+
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/konikvranik/jdbc-influxdb")
+			credentials {
+				username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+				password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+			}
+		}
+	}
 	publications {
 		maven(MavenPublication) {
+			from(project.components.java)
+		}
+		gpr(MavenPublication) {
 			from(project.components.java)
 		}
 		project.publishing.publications.withType(MavenPublication) {

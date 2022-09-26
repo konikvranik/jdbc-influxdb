@@ -33,7 +33,7 @@ public class InfluxDbConnection implements Connection {
 	private boolean isClosed;
 	private final Logger log;
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
-		Pattern.compile("\\s*select\\s+['\"]keep alive['\"]\\s*", Pattern.CASE_INSENSITIVE);
+		Pattern.compile("\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
 		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1.*",
 			Pattern.CASE_INSENSITIVE);
@@ -73,7 +73,7 @@ public class InfluxDbConnection implements Connection {
 		}
 		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			return matcher.replaceAll("SELECT $2 FROM $3");
+			sql = matcher.replaceAll("SELECT $2 FROM $3");
 		}
 		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
 			sql = sql.replaceAll("\\s+\"?default\"?\\.", " ");
@@ -285,7 +285,4 @@ public class InfluxDbConnection implements Connection {
 		return false;
 	}
 
-	public InfluxDB getClient() {
-		return influxDbClient;
-	}
 }

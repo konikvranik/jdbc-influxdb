@@ -7,6 +7,8 @@ dependencies {
 	implementation "org.influxdb:influxdb-java:2.22"
 	testImplementation "org.testcontainers:influxdb:1.17.3"
 	testImplementation "ch.qos.logback:logback-classic:1.4.1"
+	testImplementation 'com.tngtech.java:junit-dataprovider:1.13.1'
+	testImplementation 'org.apache.commons:commons-collections4:4.4'
 }
 
 jar {

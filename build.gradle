@@ -1,6 +1,7 @@
 plugins {
 	id 'java-library'
 	id 'io.freefair.lombok' version '6.5.1'
+	id 'maven-publish'
 }
 dependencies {
 	api 'org.slf4j:slf4j-api:2.0.1'
@@ -12,9 +13,46 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:4.8.0'
 }
 
+repositories {
+	jcenter()
+}
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
 jar {
 	from {
 		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
+
+project.publishing {
+	publications {
+		maven(MavenPublication) {
+			from(project.components.java)
+		}
+		project.publishing.publications.withType(MavenPublication) {
+			pom {
+				organization {
+					name = 'SuTeren'
+					url = 'https://github.com/konikvranik'
+				}
+				ciManagement {
+					system = 'GitHub'
+					url = 'https://github.com/konikvranik/jdbc-influxdb/actions'
+				}
+				issueManagement {
+					system = 'GitHub'
+					url = 'https://github.com/konikvranik/jdbc-influxdb/issues'
+				}
+				scm {
+					connection = 'scm:git:https://github.com/konikvranik/jdbc-influxdb.git'
+					developerConnection = 'scm:git:ssh:git@github.com:konikvranik/jdbc-influxdb.git'
+					url = 'https://github.com/konikvranik/jdbc-influxdb/'
+				}
+			}
+		}
+	}
 }

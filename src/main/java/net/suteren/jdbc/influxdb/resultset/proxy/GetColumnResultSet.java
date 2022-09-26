@@ -11,7 +11,7 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 		throws SQLException {
 		super(influxDbConnection.createStatement()
 				.executeQuery(String.format("SHOW FIELD KEYS%1$s%2$s; SHOW TAG KEYS%1$s%2$s",
-					catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "",
+					databaseRestriction(catalog),
 					getWithClause(tableNamePattern))),
 			new String[] { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "TYPE_NAME",
 				"COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX", "NULLABLE", "REMARKS", "COLUMN_DEF",
@@ -19,7 +19,7 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 				"SCOPE_CATALOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", "IS_AUTOINCREMENT",
 				"IS_GENERATEDCOLUMN", },
 			new Object[] { null, null, null, null, Types.VARCHAR, "string", null, null, null, null, true, null, null,
-				null, null, null, null, true, null, null, Types.VARCHAR, null, null, null });
+				null, null, null, null, true, null, null, Types.VARCHAR, null, null, null }, catalog, null);
 	}
 
 	private static String getWithClause(String tableNamePattern) {
@@ -41,7 +41,9 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 	}
 
 	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
-		if (columnIndex == 3 || columnIndex == 21) {
+		if (columnIndex == 1) {
+			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
+		} else if (columnIndex == 3 || columnIndex == 21) {
 			return (T) getMetaData().getTableName(columnIndex);
 		} else if (columnIndex == 5 || columnIndex == 22) {
 			return (T) Integer.valueOf(Types.NUMERIC);

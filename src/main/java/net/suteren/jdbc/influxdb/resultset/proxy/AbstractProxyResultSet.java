@@ -37,8 +37,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 	private final Object[] defaults;
 	private final InfluxDbResultSet influxDbResultSet;
 	private final Logger log;
-	private final String catalog;
 	private final String schema;
+	protected String catalog;
 
 	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
 		this(influxDbResultSet, columns, defaults, null, null);
@@ -260,6 +260,10 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 
 	@Override public String getString(int columnIndex) throws SQLException {
 		return mapOrDefault(columnIndex, influxDbResultSet::getString);
+	}
+
+	protected static String databaseRestriction(String catalog) {
+		return catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "";
 	}
 
 	protected abstract int remapIndex(int columnIndex);

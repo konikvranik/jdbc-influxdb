@@ -712,7 +712,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public GetSchemaResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
-		return null; //TODO: new GetSchemaResultSet(influxDbConnection, catalog, schemaPattern);
+		return new GetSchemaResultSet(influxDbConnection, catalog, schemaPattern);
 	}
 
 	@Override public boolean supportsStoredFunctionsUsingCallSyntax() {

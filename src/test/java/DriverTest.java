@@ -13,7 +13,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.InfluxDBContainer;
@@ -49,9 +49,9 @@ public class DriverTest {
 	);
 	@ClassRule public static InfluxDBContainer<?> influxDbContainer =
 		new InfluxDBContainer<>(DockerImageName.parse("influxdb:1.8"));
-	private InfluxDB influxDB;
+	private static InfluxDB influxDB;
 
-	@Before public void setUp() {
+	@BeforeClass public static void setUp() {
 		influxDB = influxDbContainer.withUsername(USERNAME).withPassword(PASSWORD).getNewInfluxDB();
 		influxDB.query(new Query(String.format("CREATE DATABASE %s;", DATABASE)));
 		influxDB.query(new Query(String.format("CREATE DATABASE %s;", DATABASE1)));

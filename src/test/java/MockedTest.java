@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
@@ -36,18 +35,25 @@ public class MockedTest {
 	InfluxDbConnection connection;
 	private AutoCloseable closeable;
 
-	@Before public void setUp() {
+	@Before public void setUp() throws SQLException {
 		closeable = MockitoAnnotations.openMocks(this);
 		when(influxDB.query(any(Query.class))).thenAnswer(invocation -> {
 			log.info("Query: {}", invocation.getArgument(0, Query.class).getCommand());
 			return new QueryResult();
 		});
-
-		connection = getInfluxDbConnection(influxDbDriver);
+		Pong pong = new Pong();
+		pong.setVersion("TEST");
+		when(influxDB.ping()).thenReturn(pong);
+		InfluxDbConnection connection1 =
+			spy(new InfluxDbConnection("http://localhost:8086?db=test", "username", "password",
+				"database", influxDbDriver));
+		when(connection1.getClient()).thenReturn(influxDB);
+		doReturn(connection1).when(influxDbDriver).connect(anyString(), any(Properties.class));
+		connection = connection1;
 
 	}
 
-	@After public void release() throws Exception {
+	@After public void tearDown() throws Exception {
 		closeable.close();
 	}
 
@@ -59,19 +65,12 @@ public class MockedTest {
 		connection.close();
 	}
 
-	@SneakyThrows private InfluxDbConnection getInfluxDbConnection(InfluxDbDriver driver) {
-		mockPing(influxDB);
-		InfluxDbConnection connection =
-			spy(new InfluxDbConnection("http://localhost:8086?db=test", "username", "password",
-				"database", driver));
-		when(connection.getClient()).thenReturn(influxDB);
-		doReturn(connection).when(driver).connect(anyString(), any(Properties.class));
-		return connection;
+	@Test public void testKeepAlive() throws SQLException {
+		InfluxDbStatement statement = connection.createStatement();
+		statement.execute("SELECT 'keep alive'");
+		verify(influxDB, times(1)).query(any(Query.class));
+		verify(influxDB).query(argThat(q -> Objects.equals(q.getCommand(), "")));
+		connection.close();
 	}
 
-	private void mockPing(InfluxDB influxDB) {
-		Pong pong = new Pong();
-		pong.setVersion("TEST");
-		when(influxDB.ping()).thenReturn(pong);
-	}
 }

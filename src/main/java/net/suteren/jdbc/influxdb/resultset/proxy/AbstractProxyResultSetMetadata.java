@@ -88,12 +88,7 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnTypeName(int column) {
-		int index = abstractProxyResultSet.remapIndex(column);
-		if (abstractProxyResultSet.getMetaData().getColumnCount() >= index && index > 0) {
-			return influxDbResultSetMetaData.getColumnTypeName(index);
-		} else {
-			return "";
-		}
+		return getColumnClassName(column);
 	}
 
 	@Override public boolean isReadOnly(int column) {
@@ -109,7 +104,12 @@ public class AbstractProxyResultSetMetadata implements ResultSetMetaData {
 	}
 
 	@Override public String getColumnClassName(int column) {
-		return influxDbResultSetMetaData.getColumnClassName(abstractProxyResultSet.remapIndex(column));
+		int index = abstractProxyResultSet.remapIndex(column);
+		if (influxDbResultSetMetaData.getColumnCount() >= index && index > 0) {
+			return influxDbResultSetMetaData.getColumnTypeName(index);
+		} else {
+			return "java.Object";
+		}
 	}
 
 	@Override public <T> T unwrap(Class<T> iface) {

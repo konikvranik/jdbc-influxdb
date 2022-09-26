@@ -35,7 +35,11 @@ public class InfluxDbConnection implements Connection {
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
 		Pattern.compile("\\s*select\\s+['\"]keep alive['\"]\\s*", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1",
+		Pattern.compile("\\s*SELECT\\s+([^\\s.])\\.(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?\\1.*",
+			Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern DEFAULT_SCHEMA_PATTERN =
+		Pattern.compile("\\s*SELECT\\s+(?:\"?default\"?\\.(\\S+)(?:\\s*,\\s*)?)+\\s+FROM\\s+.*",
 			Pattern.CASE_INSENSITIVE);
 
 	public InfluxDbConnection(String url, String username, String password, String database,
@@ -62,13 +66,17 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public String nativeSQL(String sql) {
-		log.fine(() -> String.format("NativeSQL: %s", sql));
+		String finalSql = sql;
+		log.fine(() -> String.format("NativeSQL: %s", finalSql));
 		if (KEEP_ALIVE_SQL_PATTERN.matcher(sql).matches()) {
 			return "";
 		}
 		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
 			return matcher.replaceAll("SELECT $2 FROM $3");
+		}
+		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
+			sql = sql.replaceAll("\\s+\"?default\"?\\.", " ");
 		}
 		return sql;
 	}

@@ -13,7 +13,7 @@ public class GetSchemaResultSet extends AbstractProxyResultSet {
 		throws SQLException {
 		super(prepareResults(influxDbConnection, catalog),
 			new String[] { "TABLE_SCHEM", "TABLE_CATALOG" },
-			new String[] { "default", null }, catalog, null);
+			new String[] { null, null }, catalog, null);
 	}
 
 	private static InfluxDbResultSet prepareResults(InfluxDbConnection influxDbConnection, String catalog)

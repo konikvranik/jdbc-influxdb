@@ -51,12 +51,12 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 		} else if (isBeforeFirst()) {
 			return first();
 		}
-		if (influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size()) {
+		if (influxDbResultSet.getRowPosition().intValue() < influxDbResultSet.getCurrentRows().size() - 1) {
 			influxDbResultSet.getRowPosition().incrementAndGet();
 		} else if (influxDbResultSet.getCurrentResult()
 			.map(QueryResult.Result::getSeries)
 			.map(List::size)
-			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() + 1 < s)
+			.filter(s -> influxDbResultSet.getSeriesPosition().intValue() < s - 1)
 			.isPresent()) {
 			influxDbResultSet.getSeriesPosition().incrementAndGet();
 			influxDbResultSet.getRowPosition().set(0);
@@ -179,6 +179,8 @@ public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
 				.map(s -> s - 1)
 				.orElse(0));
 			influxDbResultSet.getRowPosition().set(influxDbResultSet.getCurrentRows().size() - 1);
+		} else {
+			influxDbResultSet.getRowPosition().decrementAndGet();
 		}
 		return !isBeforeFirst();
 	}

@@ -1,6 +1,7 @@
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -18,6 +19,7 @@ import org.testcontainers.utility.DockerImageName;
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.InfluxDbDriver;
 import net.suteren.jdbc.influxdb.InfluxDbMetadata;
+import net.suteren.jdbc.influxdb.resultset.proxy.AbstractProxyResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 
 import static org.junit.Assert.assertEquals;
@@ -106,7 +108,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		}
 		assertFalse(tables.getStatement().getMoreResults());
 
-		ResultSet columns = metaData.getColumns(null, null, null, null);
+		AbstractProxyResultSet columns = metaData.getColumns(null, null, null, null);
 		Iterator<String[]> expectations = List.of(
 			new String[] { "measurement1", "field1", "integer" },
 			new String[] { "measurement1", "field2", "integer" },
@@ -186,7 +188,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		assertNull(columns.getString("TABLE_SCHEM"));
 		assertEquals(measurementName, columns.getString("TABLE_NAME"));
 		assertEquals(fieldName, columns.getString("COLUMN_NAME"));
-		assertEquals(type, columns.getString("DATA_TYPE"));
+		assertEquals(Types.NUMERIC, columns.getInt("DATA_TYPE"));
 		assertEquals(type, columns.getString("TYPE_NAME"));
 		assertNull(columns.getString("COLUMN_SIZE"));
 		assertNull(columns.getString("BUFFER_LENGTH"));
@@ -203,7 +205,7 @@ public class DriverTest<SELF extends InfluxDBContainer<SELF>> {
 		assertNull(columns.getString("SCOPE_CATALOG"));
 		assertNull(columns.getString("SCOPE_SCHEMA"));
 		assertEquals(measurementName, columns.getString("SCOPE_TABLE"));
-		assertEquals(type, columns.getString("SOURCE_DATA_TYPE"));
+		assertEquals(Types.NUMERIC, columns.getInt("SOURCE_DATA_TYPE"));
 		assertNull(columns.getObject("IS_AUTOINCREMENT"));
 		assertNull(columns.getObject("IS_GENERATEDCOLUMN"));
 	}

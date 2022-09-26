@@ -7,6 +7,7 @@ import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
+import net.suteren.jdbc.influxdb.resultset.proxy.AbstractProxyResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetFieldKeysResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTablesResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetTagKeysResultSet;
@@ -529,7 +530,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
+	public AbstractProxyResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
 		String columnNamePattern) throws SQLException {
 		return new GetFieldKeysResultSet(influxDbConnection,
 			tableNamePattern == null || PERCENT_PATTERN.matcher(tableNamePattern).matches() ? null : tableNamePattern);

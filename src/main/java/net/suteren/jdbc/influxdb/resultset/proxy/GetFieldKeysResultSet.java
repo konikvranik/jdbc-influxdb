@@ -16,7 +16,7 @@ public class GetFieldKeysResultSet extends AbstractProxyResultSet {
 				"SCOPE_CATALOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", "IS_AUTOINCREMENT",
 				"IS_GENERATEDCOLUMN", },
 			new Object[] { null, null, null, null, Types.VARCHAR, "string", null, null, null, null, true, null, null,
-				null, null, null, null, true, null, null, null, null, null, null });
+				null, null, null, null, true, null, null, Types.VARCHAR, null, null, null });
 	}
 
 	private static String getWithClause(String tableNamePattern) {
@@ -37,11 +37,13 @@ public class GetFieldKeysResultSet extends AbstractProxyResultSet {
 		}
 	}
 
-	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> o) throws SQLException {
+	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
 		if (columnIndex == 3 || columnIndex == 21) {
 			return (T) getMetaData().getTableName(columnIndex);
+		} else if (columnIndex == 5 || columnIndex == 22) {
+			return (T) Integer.valueOf(Types.NUMERIC);
 		} else {
-			return super.mapOrDefault(columnIndex, o);
+			return super.mapOrDefault(columnIndex, function);
 		}
 	}
 }

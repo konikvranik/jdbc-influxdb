@@ -51,7 +51,8 @@ public class InfluxDbDriver implements java.sql.Driver {
 			URL url1 = new URL(url);
 			String[] ui = Optional.ofNullable(url1.getUserInfo()).map(u -> u.split(":", 2)).orElse(null);
 
-			Map<String, String> properties = Arrays.stream(url1.getQuery().split("&"))
+			Map<String, String> properties =Optional.ofNullable(url1.getQuery()).stream()
+				.flatMap(s-> Arrays.stream(s.split("&")))
 				.map(x -> x.split("=", 2))
 				.collect(Collectors.groupingBy(x -> x[0], Collectors.mapping(x -> x[1], Collectors.joining(","))));
 			if (ui != null && ui.length > 0 && StringUtils.isNotBlank(ui[0])) {

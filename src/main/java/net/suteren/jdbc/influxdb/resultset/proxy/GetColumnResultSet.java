@@ -40,7 +40,7 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 		}
 	}
 
-	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
+	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) {
 		if (columnIndex == 1) {
 			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
 		} else if (columnIndex == 3 || columnIndex == 21) {

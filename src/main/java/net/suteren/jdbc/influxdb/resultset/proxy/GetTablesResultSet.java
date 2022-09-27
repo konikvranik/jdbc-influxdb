@@ -24,7 +24,7 @@ public class GetTablesResultSet extends AbstractProxyResultSet {
 		return columnIndex == 3 ? 1 : 0;
 	}
 
-	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
+	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) {
 		if (columnIndex == 1) {
 			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
 		} else {

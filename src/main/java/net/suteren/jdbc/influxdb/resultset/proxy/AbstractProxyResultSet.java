@@ -3,7 +3,6 @@ package net.suteren.jdbc.influxdb.resultset.proxy;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -19,10 +18,8 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -52,6 +49,10 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		log = influxDbResultSet.getStatement().getConnection().getMetaData().getDriver().getParentLogger();
 		this.catalog = catalog;
 		this.schema = schema;
+	}
+
+	@Override public <T> T getObject(int columnIndex, Class<T> type) {
+		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, type));
 	}
 
 	@Override public int findColumn(String columnLabel) throws SQLException {
@@ -211,238 +212,14 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		return !isBeforeFirst();
 	}
 
-	@Override public ProxyResultSetMetadata getMetaData() {
-		return new ProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns, catalog, schema);
-	}
-
-	@Override public void setFetchDirection(int direction) {
-		influxDbResultSet.setFetchDirection(direction);
-	}
-
-	@Override public int getFetchDirection() {
-		return influxDbResultSet.getFetchDirection();
-	}
-
-	@Override public void setFetchSize(int rows) {
-		influxDbResultSet.setFetchSize(rows);
-	}
-
-	@Override public int getFetchSize() {
-		return influxDbResultSet.getFetchSize();
-	}
-
-	@Override public int getType() {
-		return influxDbResultSet.getType();
-	}
-
-	@Override public int getConcurrency() {
-		return influxDbResultSet.getConcurrency();
-	}
-
-	@Override public void moveToInsertRow() {
-		influxDbResultSet.moveToInsertRow();
-	}
-
-	@Override public void moveToCurrentRow() {
-		influxDbResultSet.moveToCurrentRow();
-	}
-
-	@Override public SQLWarning getWarnings() {
-		return influxDbResultSet.getWarnings();
-	}
-
-	@Override public void clearWarnings() {
-		influxDbResultSet.clearWarnings();
-	}
-
-	@Override public String getCursorName() {
-		return influxDbResultSet.getCursorName();
-	}
-
-	@Override public void close() {
-		influxDbResultSet.close();
-	}
-
-	@Override public boolean isClosed() {
-		return influxDbResultSet.isClosed();
-	}
-
-	@Override public int getHoldability() {
-		return influxDbResultSet.getHoldability();
-	}
-
-	@Override public Object getObject(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
-	}
-
-	@Override public String getString(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getString);
-	}
-
 	protected static String databaseRestriction(String catalog) {
 		return catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "";
 	}
 
 	protected abstract int remapIndex(int columnIndex);
 
-	@Override public boolean getBoolean(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBoolean);
-	}
-
-	@Override public byte getByte(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getByte);
-	}
-
-	@Override public short getShort(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getShort);
-	}
-
-	@Override public int getInt(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getInt);
-	}
-
-	@Override public long getLong(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getLong);
-	}
-
-	@Override public float getFloat(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getFloat);
-	}
-
-	@Override public double getDouble(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getDouble);
-	}
-
-	@Override public BigDecimal getBigDecimal(int columnIndex, int scale) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getBigDecimal(index, scale));
-	}
-
-	@Override public byte[] getBytes(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBytes);
-	}
-
-	@Override public Date getDate(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getDate);
-	}
-
-	@Override public Time getTime(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getTime);
-	}
-
-	@Override public Timestamp getTimestamp(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getTimestamp);
-	}
-
-	@Override public InputStream getAsciiStream(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getAsciiStream);
-	}
-
-	@Override public InputStream getUnicodeStream(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getUnicodeStream);
-	}
-
-	@Override public InputStream getBinaryStream(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBinaryStream);
-	}
-
-	@Override public Reader getCharacterStream(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getCharacterStream);
-	}
-
-	@Override public BigDecimal getBigDecimal(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBigDecimal);
-	}
-
-	@Override public Statement getStatement() {
-		return influxDbResultSet.getStatement();
-	}
-
-	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, map));
-	}
-
-	@Override public Ref getRef(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getRef);
-	}
-
-	@Override public Blob getBlob(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBlob);
-	}
-
-	@Override public Clob getClob(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getClob);
-	}
-
-	@Override public Array getArray(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getArray);
-	}
-
-	@Override public Date getDate(int columnIndex, Calendar cal) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getDate(index, cal));
-	}
-
-	@Override public Time getTime(int columnIndex, Calendar cal) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getTime(index, cal));
-	}
-
-	@Override public Timestamp getTimestamp(int columnIndex, Calendar cal) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getTimestamp(index, cal));
-	}
-
-	@Override public URL getURL(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getURL);
-	}
-
-	@Override public RowId getRowId(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getRowId);
-	}
-
-	@Override public NClob getNClob(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNClob);
-	}
-
-	@Override public SQLXML getSQLXML(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getSQLXML);
-	}
-
-	@Override public String getNString(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNString);
-	}
-
-	@Override public Reader getNCharacterStream(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNCharacterStream);
-	}
-
-	@Override public <T> T getObject(int columnIndex, Class<T> type) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, type));
-	}
-
-	@Override public boolean wasNull() {
-		return influxDbResultSet.wasNull();
-	}
-
-	@Override public void refreshRow() {
-		influxDbResultSet.refreshRow();
-	}
-
-	@Override public <T> T unwrap(Class<T> iface) {
-		return influxDbResultSet.unwrap(iface);
-	}
-
-	@Override public boolean isWrapperFor(Class<?> iface) {
-		return influxDbResultSet.isWrapperFor(iface);
-	}
-
-	@Override public boolean rowUpdated() {
-		return influxDbResultSet.rowUpdated();
-	}
-
-	@Override public boolean rowInserted() {
-		return influxDbResultSet.rowInserted();
-	}
-
-	@Override public boolean rowDeleted() {
-		return influxDbResultSet.rowDeleted();
+	@Override public ProxyResultSetMetadata getMetaData() {
+		return new ProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns, catalog, schema);
 	}
 
 	@Override public void updateNull(int columnIndex) {
@@ -519,22 +296,6 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 
 	@Override public void updateObject(int columnIndex, Object x) {
 		influxDbResultSet.updateObject(remapIndex(columnIndex), x);
-	}
-
-	@Override public void insertRow() {
-		influxDbResultSet.insertRow();
-	}
-
-	@Override public void updateRow() {
-		influxDbResultSet.updateRow();
-	}
-
-	@Override public void deleteRow() {
-		influxDbResultSet.deleteRow();
-	}
-
-	@Override public void cancelRowUpdates() {
-		influxDbResultSet.cancelRowUpdates();
 	}
 
 	@Override public void updateRef(int columnIndex, Ref x) {
@@ -628,6 +389,110 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 	@Override public void updateObject(int columnIndex, Object x, SQLType targetSqlType, int scaleOrLength)
 		throws SQLException {
 		influxDbResultSet.updateObject(remapIndex(columnIndex), x, targetSqlType, scaleOrLength);
+	}
+
+	@Override public void setFetchDirection(int direction) {
+		influxDbResultSet.setFetchDirection(direction);
+	}
+
+	@Override public int getFetchDirection() {
+		return influxDbResultSet.getFetchDirection();
+	}
+
+	@Override public void setFetchSize(int rows) {
+		influxDbResultSet.setFetchSize(rows);
+	}
+
+	@Override public int getFetchSize() {
+		return influxDbResultSet.getFetchSize();
+	}
+
+	@Override public int getType() {
+		return influxDbResultSet.getType();
+	}
+
+	@Override public int getConcurrency() {
+		return influxDbResultSet.getConcurrency();
+	}
+
+	@Override public void moveToInsertRow() {
+		influxDbResultSet.moveToInsertRow();
+	}
+
+	@Override public void moveToCurrentRow() {
+		influxDbResultSet.moveToCurrentRow();
+	}
+
+	@Override public SQLWarning getWarnings() {
+		return influxDbResultSet.getWarnings();
+	}
+
+	@Override public void clearWarnings() {
+		influxDbResultSet.clearWarnings();
+	}
+
+	@Override public String getCursorName() {
+		return influxDbResultSet.getCursorName();
+	}
+
+	@Override public void close() {
+		influxDbResultSet.close();
+	}
+
+	@Override public boolean isClosed() {
+		return influxDbResultSet.isClosed();
+	}
+
+	@Override public int getHoldability() {
+		return influxDbResultSet.getHoldability();
+	}
+
+	@Override public Statement getStatement() {
+		return influxDbResultSet.getStatement();
+	}
+
+	@Override public boolean wasNull() {
+		return influxDbResultSet.wasNull();
+	}
+
+	@Override public void refreshRow() {
+		influxDbResultSet.refreshRow();
+	}
+
+	@Override public <T> T unwrap(Class<T> iface) {
+		return influxDbResultSet.unwrap(iface);
+	}
+
+	@Override public boolean isWrapperFor(Class<?> iface) {
+		return influxDbResultSet.isWrapperFor(iface);
+	}
+
+	@Override public boolean rowUpdated() {
+		return influxDbResultSet.rowUpdated();
+	}
+
+	@Override public boolean rowInserted() {
+		return influxDbResultSet.rowInserted();
+	}
+
+	@Override public boolean rowDeleted() {
+		return influxDbResultSet.rowDeleted();
+	}
+
+	@Override public void insertRow() {
+		influxDbResultSet.insertRow();
+	}
+
+	@Override public void updateRow() {
+		influxDbResultSet.updateRow();
+	}
+
+	@Override public void deleteRow() {
+		influxDbResultSet.deleteRow();
+	}
+
+	@Override public void cancelRowUpdates() {
+		influxDbResultSet.cancelRowUpdates();
 	}
 
 	@Override public void updateObject(String columnLabel, Object x, SQLType targetSqlType, int scaleOrLength)

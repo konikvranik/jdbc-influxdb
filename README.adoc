@@ -1,0 +1,15 @@
+= InfluxDB JDBC driver
+hPa <hpa@suteren.net>
+v0.1.0, 2022-09-27
+
+Basic JDBC query functionality for the InfluxDB. Intended to help developers and data analyst to inspect data over various GUI.
+
+CAUTION: This driver does *not* provide full JDBC functionality and compatibility.
+
+image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[example workflow]
+
+== What this driver _is_
+
+
+
+== What this driver is _not_

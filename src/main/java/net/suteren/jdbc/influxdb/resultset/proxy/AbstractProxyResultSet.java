@@ -254,12 +254,8 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		return influxDbResultSet.getHoldability();
 	}
 
-	@Override public <U> U getValue(int index, Class<U> clzz, Function<Object, U> convert) throws SQLException {
-		return mapOrDefault(index, i -> influxDbResultSet.getValue(i, clzz, convert));
-	}
-
-	@Override public String getString(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getString);
+	@Override public Object getObject(int columnIndex) throws SQLException {
+		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
 	}
 
 	protected static String databaseRestriction(String catalog) {
@@ -268,140 +264,8 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 
 	protected abstract int remapIndex(int columnIndex);
 
-	@Override public boolean getBoolean(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBoolean);
-	}
-
-	@Override public byte getByte(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getByte);
-	}
-
-	@Override public short getShort(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getShort);
-	}
-
-	@Override public int getInt(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getInt);
-	}
-
-	@Override public long getLong(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getLong);
-	}
-
-	@Override public float getFloat(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getFloat);
-	}
-
-	@Override public double getDouble(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getDouble);
-	}
-
-	@Override public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getBigDecimal(index, scale));
-	}
-
-	@Override public byte[] getBytes(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBytes);
-	}
-
-	@Override public Date getDate(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getDate);
-	}
-
-	@Override public Time getTime(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getTime);
-	}
-
-	@Override public Timestamp getTimestamp(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getTimestamp);
-	}
-
-	@Override public InputStream getAsciiStream(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getAsciiStream);
-	}
-
-	@Override public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getUnicodeStream);
-	}
-
-	@Override public InputStream getBinaryStream(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBinaryStream);
-	}
-
-	@Override public Object getObject(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
-	}
-
-	@Override public Reader getCharacterStream(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getCharacterStream);
-	}
-
-	@Override public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBigDecimal);
-	}
-
 	@Override public Statement getStatement() {
 		return influxDbResultSet.getStatement();
-	}
-
-	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, map));
-	}
-
-	@Override public Ref getRef(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getRef);
-	}
-
-	@Override public Blob getBlob(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getBlob);
-	}
-
-	@Override public Clob getClob(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getClob);
-	}
-
-	@Override public Array getArray(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getArray);
-	}
-
-	@Override public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getDate(index, cal));
-	}
-
-	@Override public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getTime(index, cal));
-	}
-
-	@Override public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getTimestamp(index, cal));
-	}
-
-	@Override public URL getURL(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getURL);
-	}
-
-	@Override public RowId getRowId(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getRowId);
-	}
-
-	@Override public NClob getNClob(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNClob);
-	}
-
-	@Override public SQLXML getSQLXML(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getSQLXML);
-	}
-
-	@Override public String getNString(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNString);
-	}
-
-	@Override public Reader getNCharacterStream(int columnIndex) throws SQLException {
-		return mapOrDefault(columnIndex, influxDbResultSet::getNCharacterStream);
-	}
-
-	@Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, type));
 	}
 
 	@Override public boolean wasNull() {

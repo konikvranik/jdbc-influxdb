@@ -19,7 +19,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.function.Function;
 
 public abstract class AbstractBaseResultSet implements ResultSet {
 	public String getString(String columnLabel) throws SQLException {
@@ -85,8 +84,6 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 	public InputStream getBinaryStream(String columnLabel) throws SQLException {
 		return getBinaryStream(findColumn(columnLabel));
 	}
-
-	protected abstract <U> U getValue(int index, Class<U> clazz, Function<Object, U> convert) throws SQLException;
 
 	public Reader getCharacterStream(String columnLabel) throws SQLException {
 		return new InputStreamReader(getUnicodeStream(columnLabel));
@@ -213,7 +210,7 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 	}
 
 	@Override public Object getObject(String columnLabel) throws SQLException {
-		return getValue(findColumn(columnLabel), Object.class, Function.identity());
+		return getObject(findColumn(columnLabel));
 	}
 
 	@Override public void updateNull(String columnLabel) {

@@ -31,11 +31,11 @@ public class GetIndexResultSet extends AbstractProxyResultSet {
 		}
 	}
 
-	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
+	@Override protected Object mapOrDefault(int columnIndex, Function<Integer, Object> function) {
 		if (columnIndex == 1) {
-			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
+			return catalog == null ? super.mapOrDefault(columnIndex, function) : catalog;
 		} else if (columnIndex == 3) {
-			return (T) getMetaData().getTableName(columnIndex);
+			return getMetaData().getTableName(columnIndex);
 		} else {
 			return super.mapOrDefault(columnIndex, function);
 		}

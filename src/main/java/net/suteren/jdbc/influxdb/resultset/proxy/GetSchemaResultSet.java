@@ -34,9 +34,9 @@ public class GetSchemaResultSet extends AbstractProxyResultSet {
 		return columnIndex == 2 ? 1 : 0;
 	}
 
-	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) throws SQLException {
+	@Override protected Object mapOrDefault(int columnIndex, Function<Integer, Object> function) {
 		if (columnIndex == 2) {
-			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
+			return catalog == null ? super.mapOrDefault(columnIndex, function) : catalog;
 		} else {
 			return super.mapOrDefault(columnIndex, function);
 		}

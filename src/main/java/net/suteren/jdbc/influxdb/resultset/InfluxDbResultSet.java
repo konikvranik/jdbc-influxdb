@@ -10,10 +10,12 @@ import java.sql.Date;
 import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.RowId;
+import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Function;
 
 import org.influxdb.dto.QueryResult;
 
@@ -216,5 +218,4 @@ public class InfluxDbResultSet extends AbstractReadableInfluxDbResultSet {
 	@Override public void updateNClob(int columnIndex, Reader reader) {
 
 	}
-
 }

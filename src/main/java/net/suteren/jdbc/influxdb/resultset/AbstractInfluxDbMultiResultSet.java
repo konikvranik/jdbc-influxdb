@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 import org.influxdb.dto.QueryResult;
 
 import lombok.Getter;
-import net.suteren.jdbc.AbstractBaseResultSet;
+import net.suteren.jdbc.AbstractTypeMappingResultSet;
 
-public abstract class AbstractInfluxDbMultiResultSet extends AbstractBaseResultSet {
+public abstract class AbstractInfluxDbMultiResultSet extends AbstractTypeMappingResultSet {
 	private final List<QueryResult.Result> results;
 	@Getter protected final AtomicInteger resultPosition = new AtomicInteger(0);
 	@Getter protected final AtomicInteger seriesPosition = new AtomicInteger(0);

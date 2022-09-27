@@ -28,10 +28,10 @@ import java.util.logging.Logger;
 
 import org.influxdb.dto.QueryResult;
 
-import net.suteren.jdbc.AbstractBaseResultSet;
+import net.suteren.jdbc.AbstractTypeMappingResultSet;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
 
-public abstract class AbstractProxyResultSet extends AbstractBaseResultSet {
+public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSet {
 
 	private final String[] columns;
 	private final Object[] defaults;

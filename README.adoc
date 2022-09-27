@@ -16,7 +16,7 @@ CAUTION: This driver does *not* provide full JDBC functionality and compatibilit
 image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[example workflow]
 
 [[supported]]
-== What _is_ supprted
+== What _is_ supported
 
 This driver should provide basic query functionality for various IDEs and GUI DB clients.
 You can send {uri-InfluxQL}[InfluxQL] queries which are returned as sets of result sets.

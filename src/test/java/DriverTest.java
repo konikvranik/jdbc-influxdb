@@ -188,15 +188,27 @@ public class DriverTest {
 
 	@Test public void someTestMethod() throws SQLException {
 		try (InfluxDbConnection conn = connectDb()) {
-			ResultSet r = conn.createStatement().executeQuery("show databases");
-			assertTrue(r.isBeforeFirst());
-			assertTrue(r.first());
-			assertTrue(r.isFirst());
-			assertEquals("test", r.getString(1));
-			assertEquals("test", r.getString("name"));
-			assertEquals("test", r.getString("NAME"));
-			assertFalse(r.getStatement().getMoreResults());
+			ResultSet r = conn.createStatement().executeQuery("select * from measurement1");
+			assertBefore(r);
+			r.next();
+			assertFirst(r);
+			assertEquals(13.0f, r.getFloat(2), .00001);
+			assertEquals(13.0f, r.getFloat("field1"), .00001);
+			assertEquals("tag1value", r.getString("tag1"));
+			r.next();
+			assertEquals(13.0f, r.getFloat(2), .00001);
+			assertEquals(13.0f, r.getFloat("field2"), .00001);
+			assertEquals("tag2value", r.getString("tag2"));
+			r.next();
+			assertAfter(r);
 		}
+	}
+
+	private static void assertFirst(ResultSet catalogs) throws SQLException {
+		assertFalse(catalogs.isBeforeFirst());
+		assertTrue(catalogs.isFirst());
+		assertFalse(catalogs.isLast());
+		assertFalse(catalogs.isAfterLast());
 	}
 
 	private static void assertAfter(ResultSet resultset) throws SQLException {

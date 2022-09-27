@@ -18,6 +18,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.SneakyThrows;
 
@@ -95,27 +96,27 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 	}
 
 	@Override public byte getByte(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Byte.class);
+		return Optional.ofNullable(getObject(columnIndex, Byte.class)).orElse((byte) 0);
 	}
 
 	@Override public short getShort(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Short.class);
+		return Optional.ofNullable(getObject(columnIndex, Short.class)).orElse((short) 0);
 	}
 
 	@Override public int getInt(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Integer.class);
+		return Optional.ofNullable(getObject(columnIndex, Integer.class)).orElse(0);
 	}
 
 	@Override public long getLong(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Long.class);
+		return Optional.ofNullable(getObject(columnIndex, Long.class)).orElse(0L);
 	}
 
 	@Override public float getFloat(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Float.class);
+		return Optional.ofNullable(getObject(columnIndex, Float.class)).orElse(0f);
 	}
 
 	@Override public double getDouble(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Double.class);
+		return Optional.ofNullable(getObject(columnIndex, Double.class)).orElse(0d);
 	}
 
 	@Override public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {

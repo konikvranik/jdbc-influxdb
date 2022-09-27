@@ -34,7 +34,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean allTablesAreSelectable() {
-		return false;
+		return true;
 	}
 
 	@Override public String getURL() {
@@ -98,7 +98,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsMixedCaseIdentifiers() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean storesUpperCaseIdentifiers() {
@@ -114,7 +114,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsMixedCaseQuotedIdentifiers() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean storesUpperCaseQuotedIdentifiers() {
@@ -134,11 +134,33 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getSQLKeywords() {
-		return "";
+		return "measurement,field,tag,series";
 	}
 
 	@Override public String getNumericFunctions() {
-		return "";
+		return "COUNT([ * | <field_key> | /<regular_expression>/ ]),DISTINCT( [ <field_key> | /<regular_expression>/ ] ),"
+			+ "DISTINCT( [ <field_key> | /<regular_expression>/ ] ),DISTINCT( [ <field_key> | /<regular_expression>/ ] ),"
+			+ "MEDIAN( [ * | <field_key> | /<regular_expression>/ ] ),MODE( [ * | <field_key> | /<regular_expression>/ ] ),"
+			+ "SPREAD( [ * | <field_key> | /<regular_expression>/ ] ),STDDEV( [ * | <field_key> | /<regular_expression>/ ] ),"
+			+ "SUM( [ * | <field_key> | /<regular_expression>/ ] ),BOTTOM(<field_key>[,<tag_key(s)>],<N>),FIRST(<field_key>),"
+			+ "FIRST(<field_key>),MAX(<field_key>),MIN(<field_key>),PERCENTILE(<field_key>, <N>),SAMPLE(<field_key>, <N>),"
+			+ "TOP( <field_key>[,<tag_key(s)>],<N> ),ABS( [ * | <field_key> ] ),ACOS( [ * | <field_key> ] ),"
+			+ "ASIN( [ * | <field_key> ] ),ATAN( [ * | <field_key> ] ),ATAN2( [ * | <field_key> | num ], [ <field_key> | num ] ),"
+			+ "CEIL( [ * | <field_key> ] ),COS( [ * | <field_key> ] ),CUMULATIVE_SUM(<function>( [ * | <field_key> | /<regular_expression>/ ] )),"
+			+ "DERIVATIVE( [ * | <field_key> | /<regular_expression>/ ] [ , <unit> ] ),DIFFERENCE( [ * | <field_key> | /<regular_expression>/ ] ),"
+			+ "ELAPSED( [ * | <field_key> | /<regular_expression>/ ] [ , <unit> ] ),EXP( [ * | <field_key> ] ),"
+			+ "EXP( [ * | <field_key> ] ),LN( [ * | <field_key> ] ),LOG( [ * | <field_key> ], <b> ),LOG2( [ * | <field_key> ] ),"
+			+ "LOG10( [ * | <field_key> ] ),MOVING_AVERAGE( [ * | <field_key> | /<regular_expression>/ ] , <N> ),"
+			+ "NON_NEGATIVE_DERIVATIVE( [ * | <field_key> | /<regular_expression>/ ] [ , <unit> ] ),"
+			+ "NON_NEGATIVE_DIFFERENCE( [ * | <field_key> | /<regular_expression>/ ] ),POW( [ * | <field_key> ], <x> ),"
+			+ "ROUND( [ * | <field_key> ] ),SIN( [ * | <field_key> ] ),SQRT( [ * | <field_key> ] )TAN( [ * | <field_key> ] ),"
+			+ "HOLT_WINTERS[_WITH-FIT](<function>(<field_key>),<N>,<S>),CHANDE_MOMENTUM_OSCILLATOR(PERIOD, HOLD_PERIOD),"
+			+ "EXPONENTIAL_MOVING_AVERAGE(PERIOD, HOLD_PERIOD),"
+			+ "DOUBLE_EXPONENTIAL_MOVING_AVERAGE(PERIOD, HOLD_PERIOD),KAUFMANS_EFFICIENCY_RATIO(PERIOD, HOLD_PERIOD),"
+			+ "KAUFMANS_ADAPTIVE_MOVING_AVERAGE(PERIOD, HOLD_PERIOD),"
+			+ "TRIPLE_EXPONENTIAL_MOVING_AVERAGE(PERIOD, HOLD_PERIOD),"
+			+ "TRIPLE_EXPONENTIAL_DERIVATIVE(PERIOD, HOLD_PERIOD),"
+			+ "RELATIVE_STRENGTH_INDEX(PERIOD, HOLD_PERIOD)";
 	}
 
 	@Override public String getStringFunctions() {
@@ -202,7 +224,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsGroupBy() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsGroupByUnrelated() {
@@ -210,15 +232,15 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsGroupByBeyondSelect() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsLikeEscapeClause() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsMultipleResultSets() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsMultipleTransactions() {
@@ -282,11 +304,11 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean isCatalogAtStart() {
-		return false;
+		return true;
 	}
 
 	@Override public String getCatalogSeparator() {
-		return "";
+		return ".";
 	}
 
 	@Override public boolean supportsSchemasInDataManipulation() {
@@ -585,7 +607,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsResultSetType(int type) {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsResultSetConcurrency(int type, int concurrency) {
@@ -686,7 +708,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public int getJDBCMajorVersion() {
-		return 0;
+		return 3;
 	}
 
 	@Override public int getJDBCMinorVersion() {

@@ -40,13 +40,13 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 		}
 	}
 
-	@Override protected Object mapOrDefault(int columnIndex, Function<Integer, Object> function) {
+	@Override protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> function) {
 		if (columnIndex == 1) {
-			return catalog == null ? super.mapOrDefault(columnIndex, function) : catalog;
+			return catalog == null ? super.mapOrDefault(columnIndex, function) : (T) catalog;
 		} else if (columnIndex == 3 || columnIndex == 21) {
-			return getMetaData().getTableName(columnIndex);
+			return (T) getMetaData().getTableName(columnIndex);
 		} else if (columnIndex == 5 || columnIndex == 22) {
-			return Types.NUMERIC;
+			return (T) Integer.valueOf(Types.NUMERIC);
 		} else {
 			return super.mapOrDefault(columnIndex, function);
 		}

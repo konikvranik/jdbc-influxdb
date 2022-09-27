@@ -51,8 +51,8 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		this.schema = schema;
 	}
 
-	@Override public <T> T getObject(int columnIndex, Class<T> type) {
-		return mapOrDefault(columnIndex, index -> influxDbResultSet.getObject(index, type));
+	@Override public Object getObject(int columnIndex) {
+		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
 	}
 
 	@Override public int findColumn(String columnLabel) throws SQLException {
@@ -63,10 +63,10 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		return index + 1;
 	}
 
-	protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> o) {
+	protected Object mapOrDefault(int columnIndex, Function<Integer, Object> o) {
 		int indexToProxyTable = remapIndex(columnIndex);
 		if (indexToProxyTable <= 0 || indexToProxyTable > influxDbResultSet.getMetaData().getColumnCount()) {
-			return (T) defaults[columnIndex - 1];
+			return defaults[columnIndex - 1];
 		} else {
 			return o.apply(indexToProxyTable);
 		}

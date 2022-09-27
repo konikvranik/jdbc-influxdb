@@ -47,6 +47,12 @@ public class DriverTest {
 		new String[] { "measurement2", "tag2", "string" },
 		new String[] { "measurement2", "tag3", "string" }
 	);
+	public static final List<String[]> EXPECTED_TAGS = List.of(
+		new String[] { "measurement1", "tag1", "string" },
+		new String[] { "measurement1", "tag2", "string" },
+		new String[] { "measurement2", "tag2", "string" },
+		new String[] { "measurement2", "tag3", "string" }
+	);
 	@ClassRule public static InfluxDBContainer<?> influxDbContainer =
 		new InfluxDBContainer<>(DockerImageName.parse("influxdb:1.8"));
 	private static InfluxDB influxDB;
@@ -126,6 +132,19 @@ public class DriverTest {
 		}
 	}
 
+	@Test public void testIndexes() throws SQLException {
+		try (InfluxDbConnection conn = connectDb()) {
+			ListIterator<String[]> expectations = EXPECTED_TAGS.listIterator();
+			AbstractProxyResultSet columns = conn.getMetaData().getIndexInfo(null, null, null, true,true);
+			assertBefore(columns);
+			while (columns.next()) {
+				String[] ex = expectations.next();
+				assertIndex(columns, ex[0], ex[1], ex[2]);
+			}
+			assertAfter(columns);
+		}
+	}
+
 	@Test public void testColumns() throws SQLException {
 		try (InfluxDbConnection conn = connectDb()) {
 			ListIterator<String[]> expectations = EXPECTED_FIELDS.listIterator();
@@ -137,7 +156,6 @@ public class DriverTest {
 			}
 			assertAfter(columns);
 		}
-
 	}
 
 	@Test public void testColumnsWithWildcardAndReverse() throws SQLException {
@@ -172,7 +190,6 @@ public class DriverTest {
 			}
 			assertAfter(columns);
 		}
-
 	}
 
 	@Test public void testMetadata() throws SQLException {
@@ -242,6 +259,16 @@ public class DriverTest {
 		assertNull(tables.getString("SELF_REFERENCING_COL_NAME"));
 		assertNull(tables.getString("REF_GENERATION"));
 	}
+
+	private static void assertIndex(ResultSet columns, String measurementName, String fieldName, String type)
+		throws SQLException {
+		assertNull(columns.getString("TABLE_CAT"));
+		assertNull(columns.getString("TABLE_SCHEM"));
+		assertEquals(measurementName, columns.getString("TABLE_NAME"));
+		assertEquals(fieldName, columns.getString("COLUMN_NAME"));
+		assertEquals(fieldName, columns.getString("INDEX_NAME"));
+	}
+
 
 	private static void assertField(ResultSet columns, String measurementName, String fieldName, String type)
 		throws SQLException {

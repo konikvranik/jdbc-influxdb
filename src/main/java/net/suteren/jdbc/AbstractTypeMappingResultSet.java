@@ -84,7 +84,8 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 
 	@SneakyThrows
 	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) {
-		return getObject(columnIndex, map.get(getMetaData().getColumnTypeName(columnIndex)));
+		Class<?> type = map.get(getMetaData().getColumnTypeName(columnIndex));
+		return type == null ? getObject(columnIndex) : getObject(columnIndex, type);
 	}
 
 	@Override public String getString(int columnIndex) throws SQLException {

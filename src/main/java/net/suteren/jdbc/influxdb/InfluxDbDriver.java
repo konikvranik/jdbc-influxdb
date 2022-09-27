@@ -76,24 +76,16 @@ public class InfluxDbDriver implements java.sql.Driver {
 		Set<DriverPropertyInfo> propertyInfos = new HashSet<>();
 		info.putAll(parseUrlParams(url));
 		if (StringUtils.isBlank(info.getProperty("db"))) {
-			propertyInfos.add(makePropertyInfo(DATABASE_PROPERTY, null,true,"Database name"));
+			propertyInfos.add(new DriverPropertyInfo(DATABASE_PROPERTY, null));
 		}
 		if (StringUtils.isBlank(info.getProperty(USERNAME_PROPERTY)) && StringUtils.isBlank(info.getProperty(
 			USER_PROPERTY))) {
-			propertyInfos.add(makePropertyInfo(USERNAME_PROPERTY, null,false,"User name"));
+			propertyInfos.add(new DriverPropertyInfo(USERNAME_PROPERTY, null));
 		}
 		if (StringUtils.isBlank(info.getProperty(PASSWORD_PROPERTY))) {
-			propertyInfos.add(makePropertyInfo(PASSWORD_PROPERTY, null,false,"Password"));
+			propertyInfos.add(new DriverPropertyInfo(PASSWORD_PROPERTY, null));
 		}
 		return propertyInfos.toArray(DriverPropertyInfo[]::new);
-	}
-
-	private static DriverPropertyInfo makePropertyInfo(String databaseProperty, String value, boolean required,
-		String description) {
-		DriverPropertyInfo driverPropertyInfo = new DriverPropertyInfo(databaseProperty, value );
-		driverPropertyInfo.required = required;
-		driverPropertyInfo.description = description;
-		return driverPropertyInfo;
 	}
 
 	@Override public int getMajorVersion() {

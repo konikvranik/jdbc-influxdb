@@ -4,7 +4,6 @@ plugins {
 	id 'maven-publish'
 }
 dependencies {
-	api 'org.slf4j:slf4j-api:2.0.1'
 	implementation "org.influxdb:influxdb-java:2.22"
 	testImplementation "org.testcontainers:influxdb:1.17.3"
 	testImplementation "ch.qos.logback:logback-classic:1.4.1"

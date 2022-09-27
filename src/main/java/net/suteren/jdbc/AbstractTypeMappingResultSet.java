@@ -1,6 +1,5 @@
 package net.suteren.jdbc;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -19,71 +18,14 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-import lombok.SneakyThrows;
-
 public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet {
 
-	@SuppressWarnings("unchecked")
-	@Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-		Object object = getObject(columnIndex);
-		if (object == null) {
-			return null;
-		} else if (type.isInstance(object)) {
-			return (T) object;
-		} else if (type == String.class) {
-			return (T) String.valueOf(object);
-		} else if (type == Boolean.class) {
-			return (T) Boolean.valueOf(String.valueOf(object));
-		} else if (type == Byte.class) {
-			return (T) Byte.valueOf(String.valueOf(object));
-		} else if (type == Short.class) {
-			return (T) Short.valueOf(String.valueOf(object));
-		} else if (type == Integer.class) {
-			return (T) Integer.valueOf(String.valueOf(object));
-		} else if (type == Long.class) {
-			return (T) Long.valueOf(String.valueOf(object));
-		} else if (type == Float.class) {
-			return (T) Float.valueOf(String.valueOf(object));
-		} else if (type == Double.class) {
-			return (T) Double.valueOf(String.valueOf(object));
-		} else if (type == byte[].class) {
-			return (T) String.valueOf(object).getBytes();
-		} else if (type == Date.class) {
-			return (T) Date.valueOf(String.valueOf(object));
-		} else if (type == Time.class) {
-			return (T) Time.valueOf(String.valueOf(object));
-		} else if (type == Timestamp.class) {
-			return (T) Timestamp.valueOf(String.valueOf(object));
-		} else if (type == InputStream.class) {
-			return (T) new ByteArrayInputStream(String.valueOf(object).getBytes());
-		} else if (type == BigDecimal.class) {
-			return (T) BigDecimal.valueOf(Double.parseDouble(String.valueOf(object)));
-		} else if (type == Ref.class) {
-			return null;
-		} else if (type == Blob.class) {
-			return null;
-		} else if (type == Clob.class) {
-			return null;
-		} else if (type == URL.class) {
-			return null;
-		} else if (type == RowId.class) {
-			return null;
-		} else if (type == Array.class) {
-			return null;
-		} else if (type == NClob.class) {
-			return null;
-		} else if (type == SQLXML.class) {
-			return null;
-		} else if (type == Reader.class) {
-			return null;
-		} else {
-			return (T) object;
-		}
+	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
+		return null;
 	}
 
-	@SneakyThrows
-	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) {
-		return getObject(columnIndex, map.get(getMetaData().getColumnTypeName(columnIndex)));
+	@Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+		return null;
 	}
 
 	@Override public String getString(int columnIndex) throws SQLException {
@@ -148,6 +90,10 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 
 	@Override public InputStream getBinaryStream(int columnIndex) throws SQLException {
 		return getObject(columnIndex, InputStream.class);
+	}
+
+	@Override public Object getObject(int columnIndex) throws SQLException {
+		return getObject(columnIndex, Object.class);
 	}
 
 	@Override public Reader getCharacterStream(int columnIndex) throws SQLException {

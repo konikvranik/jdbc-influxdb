@@ -30,7 +30,6 @@ I tested it with IntelliJ Idea's DB support.
 * SQL syntax.
 You must send {uri-InfluxQL}[InfluxQL] queries.
 * Changing to other database when connection is already open is not implemented yet. {issues-uri}1[#1]
-* Metadata information other than specified in <<supported>>. {issues-uri}5[#5]
 * Ordering by tags or fields (columns other than `time`).
 InfluxDB doesn't support ordering except of `time`.
 * Write operations.

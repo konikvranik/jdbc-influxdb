@@ -1,8 +1,9 @@
-= InfluxDB JDBC driver
-hPa <hpa@suteren.net>
+= InfluxDB image:.resources/jdbc.png[50,60] driver
+konikvranik <hpa@suteren.net>
 v0.1.0, 2022-09-27
 
-Basic JDBC query functionality for the InfluxDB. Intended to help developers and data analyst to inspect data over various GUI.
+Basic JDBC query functionality for the InfluxDB. +
+Intended to help developers and data analyst to inspect data over various GUI.
 
 CAUTION: This driver does *not* provide full JDBC functionality and compatibility.
 

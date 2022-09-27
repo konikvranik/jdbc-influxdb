@@ -9,8 +9,119 @@ CAUTION: This driver does *not* provide full JDBC functionality and compatibilit
 
 image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[example workflow]
 
-== What this driver _is_
+[[supported]]
+== What _is_ supprted
+
+This driver should provide basic query functionality for various IDEs and GUI DB clients.
+You can send https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/[InfluxQL] queries which are returned as sets of result sets.
+
+Currently, I tested it wiht IntelliJ Idea's DB support and
+
+== What is _not_ supported
+
+* SQL syntax.
+You must send https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/[InfluxQL] queries.
+* Changing to other database when connection is already open is not implemented yet.
+* Metadata information other than specified in <<supported>>.
+* Ordering by tags or fields (columns other than `time`). InfluxDB doesn't support ordering except of `time`.
+* Write operations.
+- Updating of current records.
+InfluxDB doesn't support modify operations.
+- Creating of new points in not implemented yet.
+- Deleting of the data in not implemented yet.
+
+== Howto use it
+
+Get the driver from the GitHub repo: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version=0.1.0-alpha[influxdb-jdbc-0.1.0-alpha]
+
+For <<maven>> and <<gradle>> see related sections below.
 
 
+JDBC URL is in the form of `jdbc:influxdb:[http://][<USER>:<PASSWORD>]<HOST>[:<PORT>][?db=<DATABASE>]`.
 
-== What this driver is _not_
+Example: `jdbc:influxdb:localhost:8086?db=telegraf`
+
+You can also pass database, username and password as driver properties:
+
+[%header]
+|===
+| Property | Description
+| username | login to the InfluxDB with this username
+| user | alias for _username_
+| password | login to the InfluxDB with this password
+| database | use this database after connecting
+|===
+
+[[gradle]]
+=== Gradle
+
+.build.gradle
+[source,groovy]
+----
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/konikvranik/jdbc-influxdb")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation 'net.suteren.jdbc.influxdb:influxdb-jdbc:0.1.0-alpha'
+}
+----
+
+[[maven]]
+=== Maven
+
+.settings.xml
+[source,xml]
+----
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <activeProfiles>
+    <activeProfile>github</activeProfile>
+  </activeProfiles>
+
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/konikvranik/jdbc-influxdb</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>USERNAME</username>
+      <password>TOKEN</password>
+    </server>
+  </servers>
+</settings>
+----
+.pom.xml
+[source,xml]
+----
+<dependency>
+  <groupId>net.suteren.jdbc.influxdb</groupId>
+  <artifactId>influxdb-jdbc</artifactId>
+  <version>0.1.0-alpha</version>
+</dependency>
+----

@@ -1,4 +1,4 @@
-= InfluxDB image:.resources/jdbc.png[50,60] driver
+= InfluxDB image:.resources/jdbc.png?[50,60] driver
 konikvranik <hpa@suteren.net>
 v0.1.0, 2022-09-27
 

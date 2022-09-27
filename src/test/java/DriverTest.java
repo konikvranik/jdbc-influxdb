@@ -196,7 +196,6 @@ public class DriverTest {
 			assertEquals(13.0f, r.getFloat("field1"), .00001);
 			assertEquals("tag1value", r.getString("tag1"));
 			r.next();
-			assertEquals(13.0f, r.getFloat(2), .00001);
 			assertEquals(13.0f, r.getFloat("field2"), .00001);
 			assertEquals("tag2value", r.getString("tag2"));
 			r.next();

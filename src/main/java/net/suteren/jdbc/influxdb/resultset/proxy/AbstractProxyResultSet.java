@@ -3,6 +3,7 @@ package net.suteren.jdbc.influxdb.resultset.proxy;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -18,8 +19,10 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -49,27 +52,6 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		log = influxDbResultSet.getStatement().getConnection().getMetaData().getDriver().getParentLogger();
 		this.catalog = catalog;
 		this.schema = schema;
-	}
-
-	@Override public Object getObject(int columnIndex) {
-		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
-	}
-
-	@Override public int findColumn(String columnLabel) throws SQLException {
-		int index = Arrays.asList(columns).indexOf(columnLabel.toUpperCase());
-		if (index < 0) {
-			throw new SQLException(String.format("No column named %s", columnLabel));
-		}
-		return index + 1;
-	}
-
-	protected Object mapOrDefault(int columnIndex, Function<Integer, Object> o) {
-		int indexToProxyTable = remapIndex(columnIndex);
-		if (indexToProxyTable <= 0 || indexToProxyTable > influxDbResultSet.getMetaData().getColumnCount()) {
-			return defaults[columnIndex - 1];
-		} else {
-			return o.apply(indexToProxyTable);
-		}
 	}
 
 	@Override public boolean next() {
@@ -212,14 +194,106 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		return !isBeforeFirst();
 	}
 
+	@Override public void setFetchDirection(int direction) {
+		influxDbResultSet.setFetchDirection(direction);
+	}
+
+	@Override public int getFetchDirection() {
+		return influxDbResultSet.getFetchDirection();
+	}
+
+	@Override public void setFetchSize(int rows) {
+		influxDbResultSet.setFetchSize(rows);
+	}
+
+	@Override public int getFetchSize() {
+		return influxDbResultSet.getFetchSize();
+	}
+
+	@Override public int getType() {
+		return influxDbResultSet.getType();
+	}
+
+	@Override public int getConcurrency() {
+		return influxDbResultSet.getConcurrency();
+	}
+
+	@Override public void moveToInsertRow() {
+		influxDbResultSet.moveToInsertRow();
+	}
+
+	@Override public void moveToCurrentRow() {
+		influxDbResultSet.moveToCurrentRow();
+	}
+
+	@Override public SQLWarning getWarnings() {
+		return influxDbResultSet.getWarnings();
+	}
+
+	@Override public void clearWarnings() {
+		influxDbResultSet.clearWarnings();
+	}
+
+	@Override public ProxyResultSetMetadata getMetaData() {
+		return new ProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns, catalog, schema);
+	}
+
+	@Override public String getCursorName() {
+		return influxDbResultSet.getCursorName();
+	}
+
+	@Override public void close() {
+		influxDbResultSet.close();
+	}
+
+	@Override public boolean isClosed() {
+		return influxDbResultSet.isClosed();
+	}
+
+	@Override public int getHoldability() {
+		return influxDbResultSet.getHoldability();
+	}
+
+	@Override public Object getObject(int columnIndex) throws SQLException {
+		return mapOrDefault(columnIndex, influxDbResultSet::getObject);
+	}
+
 	protected static String databaseRestriction(String catalog) {
 		return catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "";
 	}
 
 	protected abstract int remapIndex(int columnIndex);
 
-	@Override public ProxyResultSetMetadata getMetaData() {
-		return new ProxyResultSetMetadata(influxDbResultSet.getMetaData(), this, columns, catalog, schema);
+	@Override public Statement getStatement() {
+		return influxDbResultSet.getStatement();
+	}
+
+	@Override public boolean wasNull() {
+		return influxDbResultSet.wasNull();
+	}
+
+	@Override public void refreshRow() {
+		influxDbResultSet.refreshRow();
+	}
+
+	@Override public <T> T unwrap(Class<T> iface) {
+		return influxDbResultSet.unwrap(iface);
+	}
+
+	@Override public boolean isWrapperFor(Class<?> iface) {
+		return influxDbResultSet.isWrapperFor(iface);
+	}
+
+	@Override public boolean rowUpdated() {
+		return influxDbResultSet.rowUpdated();
+	}
+
+	@Override public boolean rowInserted() {
+		return influxDbResultSet.rowInserted();
+	}
+
+	@Override public boolean rowDeleted() {
+		return influxDbResultSet.rowDeleted();
 	}
 
 	@Override public void updateNull(int columnIndex) {
@@ -296,6 +370,22 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 
 	@Override public void updateObject(int columnIndex, Object x) {
 		influxDbResultSet.updateObject(remapIndex(columnIndex), x);
+	}
+
+	@Override public void insertRow() {
+		influxDbResultSet.insertRow();
+	}
+
+	@Override public void updateRow() {
+		influxDbResultSet.updateRow();
+	}
+
+	@Override public void deleteRow() {
+		influxDbResultSet.deleteRow();
+	}
+
+	@Override public void cancelRowUpdates() {
+		influxDbResultSet.cancelRowUpdates();
 	}
 
 	@Override public void updateRef(int columnIndex, Ref x) {
@@ -391,110 +481,6 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		influxDbResultSet.updateObject(remapIndex(columnIndex), x, targetSqlType, scaleOrLength);
 	}
 
-	@Override public void setFetchDirection(int direction) {
-		influxDbResultSet.setFetchDirection(direction);
-	}
-
-	@Override public int getFetchDirection() {
-		return influxDbResultSet.getFetchDirection();
-	}
-
-	@Override public void setFetchSize(int rows) {
-		influxDbResultSet.setFetchSize(rows);
-	}
-
-	@Override public int getFetchSize() {
-		return influxDbResultSet.getFetchSize();
-	}
-
-	@Override public int getType() {
-		return influxDbResultSet.getType();
-	}
-
-	@Override public int getConcurrency() {
-		return influxDbResultSet.getConcurrency();
-	}
-
-	@Override public void moveToInsertRow() {
-		influxDbResultSet.moveToInsertRow();
-	}
-
-	@Override public void moveToCurrentRow() {
-		influxDbResultSet.moveToCurrentRow();
-	}
-
-	@Override public SQLWarning getWarnings() {
-		return influxDbResultSet.getWarnings();
-	}
-
-	@Override public void clearWarnings() {
-		influxDbResultSet.clearWarnings();
-	}
-
-	@Override public String getCursorName() {
-		return influxDbResultSet.getCursorName();
-	}
-
-	@Override public void close() {
-		influxDbResultSet.close();
-	}
-
-	@Override public boolean isClosed() {
-		return influxDbResultSet.isClosed();
-	}
-
-	@Override public int getHoldability() {
-		return influxDbResultSet.getHoldability();
-	}
-
-	@Override public Statement getStatement() {
-		return influxDbResultSet.getStatement();
-	}
-
-	@Override public boolean wasNull() {
-		return influxDbResultSet.wasNull();
-	}
-
-	@Override public void refreshRow() {
-		influxDbResultSet.refreshRow();
-	}
-
-	@Override public <T> T unwrap(Class<T> iface) {
-		return influxDbResultSet.unwrap(iface);
-	}
-
-	@Override public boolean isWrapperFor(Class<?> iface) {
-		return influxDbResultSet.isWrapperFor(iface);
-	}
-
-	@Override public boolean rowUpdated() {
-		return influxDbResultSet.rowUpdated();
-	}
-
-	@Override public boolean rowInserted() {
-		return influxDbResultSet.rowInserted();
-	}
-
-	@Override public boolean rowDeleted() {
-		return influxDbResultSet.rowDeleted();
-	}
-
-	@Override public void insertRow() {
-		influxDbResultSet.insertRow();
-	}
-
-	@Override public void updateRow() {
-		influxDbResultSet.updateRow();
-	}
-
-	@Override public void deleteRow() {
-		influxDbResultSet.deleteRow();
-	}
-
-	@Override public void cancelRowUpdates() {
-		influxDbResultSet.cancelRowUpdates();
-	}
-
 	@Override public void updateObject(String columnLabel, Object x, SQLType targetSqlType, int scaleOrLength)
 		throws SQLException {
 		influxDbResultSet.updateObject(columnLabel, x, targetSqlType, scaleOrLength);
@@ -506,5 +492,22 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 
 	@Override public void updateObject(String columnLabel, Object x, SQLType targetSqlType) throws SQLException {
 		influxDbResultSet.updateObject(columnLabel, x, targetSqlType);
+	}
+
+	@Override public int findColumn(String columnLabel) throws SQLException {
+		int index = Arrays.asList(columns).indexOf(columnLabel.toUpperCase());
+		if (index < 0) {
+			throw new SQLException(String.format("No column named %s", columnLabel));
+		}
+		return index + 1;
+	}
+
+	protected <T> T mapOrDefault(int columnIndex, Function<Integer, T> o) throws SQLException {
+		int indexToProxyTable = remapIndex(columnIndex);
+		if (indexToProxyTable <= 0 || indexToProxyTable > influxDbResultSet.getMetaData().getColumnCount()) {
+			return (T) defaults[columnIndex - 1];
+		} else {
+			return o.apply(indexToProxyTable);
+		}
 	}
 }

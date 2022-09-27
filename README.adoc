@@ -41,7 +41,7 @@ InfluxDB doesn't support modify operations.
 
 == How to use it
 
-Get the driver from the GitHub repo: {uri-packages}[influxdb-jdbc-{project-version}-alpha]
+Get the driver from the GitHub repo: {uri-packages}[influxdb-jdbc-{project-version}]
 
 For <<maven>> and <<gradle>> see related sections below.
 

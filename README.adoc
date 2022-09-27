@@ -1,6 +1,11 @@
 = InfluxDB image:.resources/jdbc.png?[50,60] driver
+:project-version: 0.1.0-alpha
+:uri-InfluxQL: https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/
+:uri-packages: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version={project-version}
+:project-uri: https://github.com/konikvranik/jdbc-influxdb
+:issues-uri: {project-uri}/issues/
 konikvranik <hpa@suteren.net>
-v0.1.0, 2022-09-27
+v{project-version}, 2022-09-27
 
 Basic JDBC query functionality for the InfluxDB. +
 Intended to help developers and data analyst to inspect data over various GUI.
@@ -13,32 +18,31 @@ image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/
 == What _is_ supprted
 
 This driver should provide basic query functionality for various IDEs and GUI DB clients.
-You can send https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/[InfluxQL] queries which are returned as sets of result sets.
+You can send {uri-InfluxQL}[InfluxQL] queries which are returned as sets of result sets.
 
 It is capable to fetch all _dababase_ (catalog) names, _measurements_ (table), _fields_ (column) and _tags_ (column & index) from the metadata.
 
 I tested it with IntelliJ Idea's DB support.
 
-
 == What is _not_ supported
 
 * SQL syntax.
-You must send https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/[InfluxQL] queries.
-* Changing to other database when connection is already open is not implemented yet. link:#1[#1]
-* Metadata information other than specified in <<supported>>.
-* Ordering by tags or fields (columns other than `time`). InfluxDB doesn't support ordering except of `time`.
+You must send {uri-InfluxQL}[InfluxQL] queries.
+* Changing to other database when connection is already open is not implemented yet. {issues-uri}1[#1]
+* Metadata information other than specified in <<supported>>. {issues-uri}5[#5]
+* Ordering by tags or fields (columns other than `time`).
+InfluxDB doesn't support ordering except of `time`.
 * Write operations.
 - Updating of current records.
 InfluxDB doesn't support modify operations.
-- Creating of new points in not implemented yet.
-- Deleting of the data in not implemented yet.
+- Creating of new points in not implemented yet. {issues-uri}2[#2]
+- Deleting of the data in not implemented yet. {issues-uri}4[#4]
 
 == Howto use it
 
-Get the driver from the GitHub repo: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version=0.1.0-alpha[influxdb-jdbc-0.1.0-alpha]
+Get the driver from the GitHub repo: {uri-packages}[influxdb-jdbc-0.1.0-alpha]
 
 For <<maven>> and <<gradle>> see related sections below.
-
 
 JDBC URL is in the form of `jdbc:influxdb:[http://][<USER>:<PASSWORD>]<HOST>[:<PORT>][?db=<DATABASE>]`.
 
@@ -59,7 +63,7 @@ You can also pass database, username and password as driver properties:
 === Gradle
 
 .build.gradle
-[source,groovy]
+[source,groovy,subs="attributes,verbatim"]
 ----
 repositories {
     maven {
@@ -72,7 +76,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.suteren.jdbc.influxdb:influxdb-jdbc:0.1.0-alpha'
+    implementation 'net.suteren.jdbc.influxdb:influxdb-jdbc:{project-version}'
 }
 ----
 
@@ -119,12 +123,13 @@ dependencies {
   </servers>
 </settings>
 ----
+
 .pom.xml
-[source,xml]
+[source,xml,subs="attributes,verbatim"]
 ----
 <dependency>
   <groupId>net.suteren.jdbc.influxdb</groupId>
   <artifactId>influxdb-jdbc</artifactId>
-  <version>0.1.0-alpha</version>
+  <version>{project-version}</version>
 </dependency>
 ----

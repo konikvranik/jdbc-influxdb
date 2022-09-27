@@ -15,7 +15,10 @@ image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/
 This driver should provide basic query functionality for various IDEs and GUI DB clients.
 You can send https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/[InfluxQL] queries which are returned as sets of result sets.
 
-Currently, I tested it wiht IntelliJ Idea's DB support and
+It is capable to fetch all _dababase_ (catalog) names, _measurements_ (table), _fields_ (column) and _tags_ (column & index) from the metadata.
+
+I tested it with IntelliJ Idea's DB support.
+
 
 == What is _not_ supported
 

@@ -24,12 +24,17 @@ import lombok.SneakyThrows;
 
 public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet {
 
+	private boolean wasNull;
+
 	@SuppressWarnings("unchecked")
 	@Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
 		Object object = getObject(columnIndex);
 		if (object == null) {
+			wasNull = true;
 			return null;
-		} else if (type.isInstance(object)) {
+		}
+		wasNull = false;
+		if (type.isInstance(object)) {
 			return (T) object;
 		} else if (type == String.class) {
 			return (T) String.valueOf(object);
@@ -82,6 +87,10 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 		}
 	}
 
+	@Override public boolean wasNull() throws SQLException {
+		return wasNull;
+	}
+
 	@SneakyThrows
 	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) {
 		Class<?> type = map.get(getMetaData().getColumnTypeName(columnIndex));
@@ -93,7 +102,7 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 	}
 
 	@Override public boolean getBoolean(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Boolean.class);
+		return Optional.ofNullable(getObject(columnIndex, Boolean.class)).orElse(false);
 	}
 
 	@Override public byte getByte(int columnIndex) throws SQLException {

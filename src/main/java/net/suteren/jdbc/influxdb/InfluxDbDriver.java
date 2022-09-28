@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -28,6 +29,10 @@ public class InfluxDbDriver implements java.sql.Driver {
 	public static final String DATABASE_PROPERTY = "database";
 	public static final String USER_PROPERTY = "user";
 
+	static {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
+	}
 	@Override public InfluxDbConnection connect(String url, Properties info) throws SQLException {
 		Pattern p = Pattern.compile("jdbc:influxdb:(.*)");
 		Matcher m = p.matcher(url);

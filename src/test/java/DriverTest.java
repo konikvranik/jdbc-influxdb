@@ -1,3 +1,4 @@
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -91,7 +92,7 @@ public class DriverTest {
 			GetSchemaResultSet schemas = conn.getMetaData().getSchemas();
 			assertBefore(schemas);
 			while (schemas.next()) {
-				assertSchema(schemas, tableNames.next());
+				assertSchema(schemas, tableNames.next(), DATABASE);
 			}
 			assertAfter(schemas);
 		}
@@ -103,7 +104,7 @@ public class DriverTest {
 			GetSchemaResultSet schemas = conn.getMetaData().getSchemas(DATABASE, null);
 			assertBefore(schemas);
 			while (schemas.next()) {
-				assertSchema(schemas, tableNames.next());
+				assertSchema(schemas, tableNames.next(), DATABASE);
 			}
 			assertAfter(schemas);
 		}
@@ -115,7 +116,7 @@ public class DriverTest {
 			GetTablesResultSet tables = conn.getMetaData().getTables(null, null, null, null);
 			assertBefore(tables);
 			while (tables.next()) {
-				assertTable(tables, tableNames.next());
+				assertTable(tables, tableNames.next(), DATABASE);
 			}
 			assertAfter(tables);
 		}
@@ -126,7 +127,7 @@ public class DriverTest {
 			Iterator<String> tableNames = List.of("measurement1", "measurement2").iterator();
 			GetTablesResultSet tables = conn.getMetaData().getTables(null, null, "%", null);
 			while (tables.next()) {
-				assertTable(tables, tableNames.next());
+				assertTable(tables, tableNames.next(), DATABASE);
 			}
 			assertFalse(tables.getStatement().getMoreResults());
 		}
@@ -135,11 +136,11 @@ public class DriverTest {
 	@Test public void testIndexes() throws SQLException {
 		try (InfluxDbConnection conn = connectDb()) {
 			ListIterator<String[]> expectations = EXPECTED_TAGS.listIterator();
-			AbstractProxyResultSet columns = conn.getMetaData().getIndexInfo(null, null, null, true,true);
+			AbstractProxyResultSet columns = conn.getMetaData().getIndexInfo(null, null, null, true, true);
 			assertBefore(columns);
 			while (columns.next()) {
 				String[] ex = expectations.next();
-				assertIndex(columns, ex[0], ex[1], ex[2]);
+				assertIndex(columns, ex[0], ex[1], ex[2], DATABASE);
 			}
 			assertAfter(columns);
 		}
@@ -152,7 +153,7 @@ public class DriverTest {
 			assertBefore(columns);
 			while (columns.next()) {
 				String[] ex = expectations.next();
-				assertField(columns, ex[0], ex[1], ex[2]);
+				assertField(columns, ex[0], ex[1], ex[2], DATABASE);
 			}
 			assertAfter(columns);
 		}
@@ -165,13 +166,13 @@ public class DriverTest {
 			assertBefore(columns);
 			while (columns.next()) {
 				String[] ex = expectations.next();
-				assertField(columns, ex[0], ex[1], ex[2]);
+				assertField(columns, ex[0], ex[1], ex[2], DATABASE);
 			}
 			assertAfter(columns);
 
 			while (columns.previous()) {
 				String[] ex = expectations.previous();
-				assertField(columns, ex[0], ex[1], ex[2]);
+				assertField(columns, ex[0], ex[1], ex[2], DATABASE);
 			}
 			assertBefore(columns);
 		}
@@ -186,7 +187,7 @@ public class DriverTest {
 			assertBefore(columns);
 			while (columns.next()) {
 				String[] ex = expectations.next();
-				assertField(columns, ex[0], ex[1], ex[2]);
+				assertField(columns, ex[0], ex[1], ex[2], DATABASE);
 			}
 			assertAfter(columns);
 		}
@@ -242,13 +243,13 @@ public class DriverTest {
 		assertFalse(catalogs.isAfterLast());
 	}
 
-	private static void assertSchema(GetSchemaResultSet schemas, String next) throws SQLException {
-		assertEquals(next, schemas.getString("TABLE_CATALOG"));
+	private static void assertSchema(GetSchemaResultSet schemas, String schema, String catalog) throws SQLException {
+		assertCatalog(catalog, schemas.getString("TABLE_CATALOG"));
 		assertNull(schemas.getString("TABLE_SCHEM"));
 	}
 
-	private static void assertTable(ResultSet tables, String tableName) throws SQLException {
-		assertNull(tables.getString("TABLE_CAT"));
+	private static void assertTable(ResultSet tables, String tableName, String catalogName) throws SQLException {
+		assertCatalog(catalogName, tables.getString("TABLE_CAT"));
 		assertNull(tables.getString("TABLE_SCHEM"));
 		assertEquals(tableName, tables.getString("TABLE_NAME"));
 		assertEquals("TABLE", tables.getString("TABLE_TYPE"));
@@ -260,19 +261,32 @@ public class DriverTest {
 		assertNull(tables.getString("REF_GENERATION"));
 	}
 
-	private static void assertIndex(ResultSet columns, String measurementName, String fieldName, String type)
-		throws SQLException {
-		assertNull(columns.getString("TABLE_CAT"));
-		assertNull(columns.getString("TABLE_SCHEM"));
-		assertEquals(measurementName, columns.getString("TABLE_NAME"));
-		assertEquals(fieldName, columns.getString("COLUMN_NAME"));
-		assertEquals(fieldName, columns.getString("INDEX_NAME"));
+	private static void assertCatalog(String expected, String tableCat) {
+		assertEquals(expected, tableCat);
 	}
 
-
-	private static void assertField(ResultSet columns, String measurementName, String fieldName, String type)
+	private static void assertIndex(ResultSet columns, String measurementName, String fieldName, String type,
+		String catalog)
 		throws SQLException {
-		assertNull(columns.getString("TABLE_CAT"));
+		assertCatalog(catalog,columns.getString("TABLE_CAT"));
+		assertNull(columns.getString("TABLE_SCHEM"));
+		assertEquals(measurementName, columns.getString("TABLE_NAME"));
+		assertEquals(true, columns.getBoolean("NON_UNIQUE"));
+		assertNull(columns.getString("INDEX_QUALIFIER"));
+		assertEquals(fieldName, columns.getString("INDEX_NAME"));
+		assertEquals(DatabaseMetaData.tableIndexOther, columns.getShort("TYPE"));
+		assertEquals(0, columns.getShort("ORDINAL_POSITION"));
+		assertEquals(fieldName, columns.getString("COLUMN_NAME"));
+		assertEquals("A", columns.getString("ASC_OR_DESC"));
+		assertEquals(0, columns.getLong("CARDINALITY"));
+		assertEquals(0, columns.getLong("PAGES"));
+		assertNull(columns.getString("FILTER_CONDITION"));
+	}
+
+	private static void assertField(ResultSet columns, String measurementName, String fieldName, String type,
+		String catalog)
+		throws SQLException {
+		assertCatalog(catalog,columns.getString("TABLE_CAT"));
 		assertNull(columns.getString("TABLE_SCHEM"));
 		assertEquals(measurementName, columns.getString("TABLE_NAME"));
 		assertEquals(fieldName, columns.getString("COLUMN_NAME"));

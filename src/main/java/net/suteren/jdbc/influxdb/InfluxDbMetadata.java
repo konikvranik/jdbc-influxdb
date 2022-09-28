@@ -600,7 +600,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate)
+	public GetIndexResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate)
 		throws SQLException {
 		return new GetIndexResultSet(influxDbConnection,
 			table == null || PERCENT_PATTERN.matcher(table).matches() ? null : table);

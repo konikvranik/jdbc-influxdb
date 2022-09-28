@@ -18,17 +18,23 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.SneakyThrows;
 
 public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet {
 
+	private boolean wasNull;
+
 	@SuppressWarnings("unchecked")
 	@Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
 		Object object = getObject(columnIndex);
 		if (object == null) {
+			wasNull = true;
 			return null;
-		} else if (type.isInstance(object)) {
+		}
+		wasNull = false;
+		if (type.isInstance(object)) {
 			return (T) object;
 		} else if (type == String.class) {
 			return (T) String.valueOf(object);
@@ -81,9 +87,14 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 		}
 	}
 
+	@Override public boolean wasNull() throws SQLException {
+		return wasNull;
+	}
+
 	@SneakyThrows
 	@Override public Object getObject(int columnIndex, Map<String, Class<?>> map) {
-		return getObject(columnIndex, map.get(getMetaData().getColumnTypeName(columnIndex)));
+		Class<?> type = map.get(getMetaData().getColumnTypeName(columnIndex));
+		return type == null ? getObject(columnIndex) : getObject(columnIndex, type);
 	}
 
 	@Override public String getString(int columnIndex) throws SQLException {
@@ -91,31 +102,31 @@ public abstract class AbstractTypeMappingResultSet extends AbstractBaseResultSet
 	}
 
 	@Override public boolean getBoolean(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Boolean.class);
+		return Optional.ofNullable(getObject(columnIndex, Boolean.class)).orElse(false);
 	}
 
 	@Override public byte getByte(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Byte.class);
+		return Optional.ofNullable(getObject(columnIndex, Byte.class)).orElse((byte) 0);
 	}
 
 	@Override public short getShort(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Short.class);
+		return Optional.ofNullable(getObject(columnIndex, Short.class)).orElse((short) 0);
 	}
 
 	@Override public int getInt(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Integer.class);
+		return Optional.ofNullable(getObject(columnIndex, Integer.class)).orElse(0);
 	}
 
 	@Override public long getLong(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Long.class);
+		return Optional.ofNullable(getObject(columnIndex, Long.class)).orElse(0L);
 	}
 
 	@Override public float getFloat(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Float.class);
+		return Optional.ofNullable(getObject(columnIndex, Float.class)).orElse(0f);
 	}
 
 	@Override public double getDouble(int columnIndex) throws SQLException {
-		return getObject(columnIndex, Double.class);
+		return Optional.ofNullable(getObject(columnIndex, Double.class)).orElse(0d);
 	}
 
 	@Override public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {

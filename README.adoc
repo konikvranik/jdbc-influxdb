@@ -30,10 +30,13 @@ I tested it with IntelliJ Idea's DB support.
 * SQL syntax.
 You must send {uri-InfluxQL}[InfluxQL] queries.
 * Changing to other database when connection is already open is not implemented yet. {issues-uri}1[#1]
-* Ordering by tags or fields (columns other than `time`).
+* Ordering by tags or fields (columns other than `time`). +
 InfluxDB doesn't support ordering except of `time`.
+* Prepared statements are not implemented yet. {issues-uri}16[#16]
+* Callable statements. +
+InfluxDB doesn't support procedures.
 * Write operations.
-- Updating of current records.
+- Updating of current records. +
 InfluxDB doesn't support modify operations.
 - Creating of new points is not implemented yet. {issues-uri}2[#2]
 - Deleting of the data is not implemented yet. {issues-uri}4[#4]
@@ -57,6 +60,7 @@ You can also pass database, username and password as driver properties:
 | user | alias for _username_
 | password | login to the InfluxDB with this password
 | database | use this database after connecting
+| db | alias fo r _database_
 |===
 
 [[gradle]]

@@ -81,9 +81,6 @@ publishing {
 		maven(MavenPublication) {
 			from(project.components.java)
 		}
-		gpr(MavenPublication) {
-			from(project.components.java)
-		}
 		project.publishing.publications.withType(MavenPublication) {
 			pom {
 				organization {

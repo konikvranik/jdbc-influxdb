@@ -79,11 +79,13 @@ publishing {
 		}
 	}
 	publications {
-		maven(MavenPublication) {
+		mavenJava(MavenPublication) {
 			from(project.components.java)
 		}
 		project.publishing.publications.withType(MavenPublication) {
 			pom {
+				name = 'influxdb-jdbc'
+				description = 'JDBC driver for InfluxDB'
 				organization {
 					name = 'SuTeren'
 					url = 'https://github.com/konikvranik'
@@ -100,6 +102,19 @@ publishing {
 					connection = 'scm:git:https://github.com/konikvranik/jdbc-influxdb.git'
 					developerConnection = 'scm:git:ssh:git@github.com:konikvranik/jdbc-influxdb.git'
 					url = 'https://github.com/konikvranik/jdbc-influxdb/'
+				}
+				licenses {
+					license {
+						name = 'The Apache License, Version 2.0'
+						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				developers {
+					developer {
+						id = 'konikvranik'
+						name = 'Petr Vraník'
+						email = 'petr@vranik.name'
+					}
 				}
 			}
 		}

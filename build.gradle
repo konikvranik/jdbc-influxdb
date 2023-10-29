@@ -78,6 +78,17 @@ publishing {
 				password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
 			}
 		}
+		maven {
+			name = "OSSRHPackages"
+			url = uri(version.endsWith('SNAPSHOT')
+					? "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+					: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+
+			credentials {
+				username = project.findProperty("ossrh.username") ?: System.getenv("OSSRH_USERNAME")
+				password = project.findProperty("ossrh.password") ?: System.getenv("OSSRH_PASSWORD")
+			}
+		}
 	}
 	publications {
 		maven(MavenPublication) {

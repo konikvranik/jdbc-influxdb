@@ -1,18 +1,20 @@
 plugins {
 	id 'java-library'
-	id 'io.freefair.lombok' version '8.4'
 	id 'maven-publish'
+	alias libs.plugins.io.freefair.lombok
+	alias libs.plugins.com.github.ben.manes.versions
+	alias libs.plugins.nl.littlerobots.version.catalog.update
 }
 dependencies {
-	implementation 'org.influxdb:influxdb-java:2.23'
-	implementation 'org.apache.commons:commons-lang3:3.13.0'
-	implementation 'org.slf4j:slf4j-api:2.0.9'
+	implementation libs.org.influxdb.influxdb.java
+	implementation libs.org.apache.commons.commons.lang3
+	implementation libs.org.slf4j.slf4j.api
 
-	testImplementation 'org.testcontainers:influxdb:1.19.1'
-	testImplementation 'ch.qos.logback:logback-classic:1.4.11'
-	testImplementation 'com.tngtech.java:junit-dataprovider:1.13.1'
-	testImplementation 'org.apache.commons:commons-collections4:4.4'
-	testImplementation 'org.mockito:mockito-core:5.6.0'
+	testImplementation libs.org.testcontainers.influxdb
+	testImplementation libs.ch.qos.logback.logback.classic
+	testImplementation libs.com.tngtech.java.junit.dataprovider
+	testImplementation libs.org.apache.commons.commons.collections4
+	testImplementation libs.org.mockito.mockito.core
 }
 
 ext.moduleName = 'InfluxDbSqlDriver'

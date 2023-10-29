@@ -1,0 +1,16 @@
+[libraries]
+ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.4.8"
+com-tngtech-java-junit-dataprovider = "com.tngtech.java:junit-dataprovider:1.13.1"
+org-apache-commons-commons-collections4 = "org.apache.commons:commons-collections4:4.4"
+org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.12.0"
+org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.1"
+org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.23"
+org-mockito-mockito-core = "org.mockito:mockito-core:5.4.0"
+org-projectlombok-lombok = "org.projectlombok:lombok:1.18.28"
+org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.7"
+org-testcontainers-influxdb = "org.testcontainers:influxdb:1.18.3"
+
+[plugins]
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.38.0"
+io-freefair-lombok = "io.freefair.lombok:8.1.0"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"

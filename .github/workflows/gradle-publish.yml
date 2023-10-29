@@ -36,7 +36,7 @@ jobs:
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
-    - name: Publish to GitHub Packages
+    - name: Publish to GitHub Packages & Open Source Project Repository Hosting
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
         arguments: publish -Pversion=${{ github.event.release.tag_name }} -i -s

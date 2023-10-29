@@ -27,7 +27,6 @@ compileJava {
 }
 
 repositories {
-	jcenter()
 	mavenCentral()
 }
 java {
@@ -55,17 +54,6 @@ jar {
 		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	duplicatesStrategy DuplicatesStrategy.EXCLUDE
-}
-
-repositories {
-	maven {
-		url = uri("https://maven.pkg.github.com/konikvranik/jdbc-influxdb")
-		credentials {
-			username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-			password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-		}
-	}
-	mavenCentral()
 }
 
 publishing {

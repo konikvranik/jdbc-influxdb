@@ -105,3 +105,8 @@ publishing {
 		}
 	}
 }
+
+signing {
+	useInMemoryPgpKeys(findProperty('signing.key') ?: System.getenv('GPG_SIGNING_KEY'), findProperty('signing.password') ?: System.getenv('GPG_SIGNING_PASSWORD'))
+	sign publishing.publications.mavenJava
+}

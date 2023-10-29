@@ -1,6 +1,7 @@
 plugins {
 	id 'java-library'
 	id 'maven-publish'
+	id 'signing'
 	alias libs.plugins.io.freefair.lombok
 	alias libs.plugins.com.github.ben.manes.versions
 	alias libs.plugins.nl.littlerobots.version.catalog.update

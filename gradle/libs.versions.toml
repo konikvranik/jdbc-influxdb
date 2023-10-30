@@ -1,5 +1,5 @@
 [libraries]
-ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.4.8"
+ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.4.11"
 com-tngtech-java-junit-dataprovider = "com.tngtech.java:junit-dataprovider:1.13.1"
 org-apache-commons-commons-collections4 = "org.apache.commons:commons-collections4:4.4"
 org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.12.0"

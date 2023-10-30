@@ -2,6 +2,7 @@ plugins {
 	id 'java-library'
 	id 'maven-publish'
 	id 'signing'
+	id 'jacoco'
 	alias libs.plugins.io.freefair.lombok
 	alias libs.plugins.com.github.ben.manes.versions
 	alias libs.plugins.nl.littlerobots.version.catalog.update
@@ -20,6 +21,14 @@ dependencies {
 
 ext.moduleName = 'InfluxDbSqlDriver'
 
+
+java {
+	sourceCompatibility = "11"
+	targetCompatibility = "11"
+	withJavadocJar()
+	withSourcesJar()
+}
+
 compileJava {
 	inputs.property('moduleName', moduleName)
 	doFirst {
@@ -27,14 +36,12 @@ compileJava {
 	}
 }
 
+test {
+	finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
 repositories {
 	mavenCentral()
-}
-java {
-	sourceCompatibility = "11"
-	targetCompatibility = "11"
-	withJavadocJar()
-	withSourcesJar()
 }
 
 javadoc {

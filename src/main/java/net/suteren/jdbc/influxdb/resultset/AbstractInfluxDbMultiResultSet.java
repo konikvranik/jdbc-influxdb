@@ -21,7 +21,7 @@ public abstract class AbstractInfluxDbMultiResultSet extends AbstractTypeMapping
 	private String cursorName;
 	protected Logger log;
 
-	public AbstractInfluxDbMultiResultSet(List<QueryResult.Result> results) {
+	protected AbstractInfluxDbMultiResultSet(List<QueryResult.Result> results) {
 		this.results = results;
 	}
 

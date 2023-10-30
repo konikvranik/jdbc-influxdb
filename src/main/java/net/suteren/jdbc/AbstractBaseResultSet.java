@@ -1,7 +1,6 @@
 package net.suteren.jdbc;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -53,6 +52,10 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 		return getDouble(findColumn(columnLabel));
 	}
 
+	/**
+	 * @deprecated See {@link AbstractBaseResultSet#getBigDecimal(String, int)}
+	 */
+	@Deprecated(since = "0.1.0")
 	public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
 		return getBigDecimal(findColumn(columnLabel), scale);
 	}
@@ -77,6 +80,10 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 		return getAsciiStream(findColumn(columnLabel));
 	}
 
+	/**
+	 * @deprecated see {@link ResultSet#getUnicodeStream(int)}
+	 */
+	@Deprecated(since = "0.1.0")
 	public InputStream getUnicodeStream(String columnLabel) throws SQLException {
 		return getUnicodeStream(findColumn(columnLabel));
 	}
@@ -86,7 +93,7 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 	}
 
 	public Reader getCharacterStream(String columnLabel) throws SQLException {
-		return new InputStreamReader(getUnicodeStream(columnLabel));
+		return getCharacterStream(findColumn(columnLabel));
 	}
 
 	public BigDecimal getBigDecimal(String columnLabel) throws SQLException {

@@ -1,7 +1,7 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.SQLException;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 
@@ -24,7 +24,7 @@ public class GetTablesResultSet extends AbstractProxyResultSet {
 		return columnIndex == 3 ? 1 : 0;
 	}
 
-	@Override protected Object mapOrDefault(int columnIndex, Function<Integer, Object> function) {
+	@Override protected Object mapOrDefault(int columnIndex, IntFunction<Object> function) {
 		if (columnIndex == 1) {
 			return catalog == null ? super.mapOrDefault(columnIndex, function) : catalog;
 		} else {

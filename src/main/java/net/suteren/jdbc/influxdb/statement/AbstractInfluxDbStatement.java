@@ -33,7 +33,7 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 	@Getter private final int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
 	@Getter private final int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
 
-	public AbstractInfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {
+	protected AbstractInfluxDbStatement(InfluxDbConnection influxDbConnection, InfluxDB client) {
 		this.influxDbConnection = influxDbConnection;
 		this.client = client;
 		log = influxDbConnection.getMetaData().getDriver().getParentLogger();

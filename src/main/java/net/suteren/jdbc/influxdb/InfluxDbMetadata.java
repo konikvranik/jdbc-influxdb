@@ -19,7 +19,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	private final String userName;
 	private final InfluxDbDriver influxDbDriver;
 	private final InfluxDbConnection influxDbConnection;
-	private final static Pattern PERCENT_PATTERN = Pattern.compile("%");
+	private static final Pattern PERCENT_PATTERN = Pattern.compile("%");
 
 	public InfluxDbMetadata(String url, String userName, InfluxDbDriver influxDbDriver,
 		InfluxDbConnection influxDbConnection) {

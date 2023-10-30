@@ -18,7 +18,8 @@ public class InfluxDbStatement extends AbstractInfluxDbStatement {
 
 	@Override public InfluxDbResultSet executeQuery(String sql) throws SQLException {
 		try {
-			return resultSet = new InfluxDbResultSet(this, executeCommand(sql).getResults());
+			resultSet = new InfluxDbResultSet(this, executeCommand(sql).getResults());
+			return resultSet;
 		} catch (Exception e) {
 			throw new SQLException(String.format("Execution of query '%s' failed: %s", sql, e.getMessage()), e);
 		}
@@ -48,11 +49,11 @@ public class InfluxDbStatement extends AbstractInfluxDbStatement {
 	}
 
 	@Override public void addBatch(String sql) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void clearBatch() {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public int[] executeBatch() {

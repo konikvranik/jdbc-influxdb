@@ -40,6 +40,13 @@ test {
 	finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
+jacocoTestReport {
+	reports {
+		xml.required = true
+		html.required = false
+	}
+}
+
 repositories {
 	mavenCentral()
 }

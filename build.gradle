@@ -87,6 +87,7 @@ publishing {
 			pom {
 				name = 'influxdb-jdbc'
 				description = 'JDBC driver for InfluxDB'
+				url = 'https://github.com/konikvranik/jdbc-influxdb'
 				organization {
 					name = 'SuTeren'
 					url = 'https://github.com/konikvranik'

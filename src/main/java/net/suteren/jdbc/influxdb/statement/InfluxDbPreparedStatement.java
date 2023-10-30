@@ -178,7 +178,7 @@ public class InfluxDbPreparedStatement extends InfluxDbStatement implements Prep
 	}
 
 	@Override public void setRowId(int parameterIndex, RowId x) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void setNString(int parameterIndex, String value) {

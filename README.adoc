@@ -13,7 +13,7 @@ Intended to help developers and data analyst to inspect data over various GUI.
 
 CAUTION: This driver does *not* provide full JDBC functionality and compatibility.
 
-image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[build]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/codeql-analysis.yml/badge.svg[code QL]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle-publish.yml/badge.svg[release] +
+image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[build]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/codeql-analysis.yml/badge.svg[code QL]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle-publish.yml/badge.svg[release]https://codecov.io/gh/konikvranik/jdbc-influxdb[image:https://codecov.io/gh/konikvranik/jdbc-influxdb/graph/badge.svg?token=3L4CCNWETC[codecov]] +
 link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=alert_status[Quality
 Gate
 Status]]link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=security_rating[Security

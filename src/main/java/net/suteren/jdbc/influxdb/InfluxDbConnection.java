@@ -12,6 +12,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -85,7 +86,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setAutoCommit(boolean autoCommit) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public boolean getAutoCommit() {
@@ -93,11 +94,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void commit() {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void rollback() {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void close() {
@@ -114,7 +115,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setReadOnly(boolean readOnly) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public boolean isReadOnly() {
@@ -122,7 +123,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setCatalog(String catalog) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public String getCatalog() {
@@ -130,7 +131,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setTransactionIsolation(int level) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public int getTransactionIsolation() {
@@ -142,7 +143,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void clearWarnings() {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public Statement createStatement(int resultSetType, int resultSetConcurrency) {
@@ -158,15 +159,15 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public Map<String, Class<?>> getTypeMap() {
-		return null;
+		return new HashMap<>();
 	}
 
 	@Override public void setTypeMap(Map<String, Class<?>> map) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void setHoldability(int holdability) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public int getHoldability() {
@@ -182,11 +183,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void rollback(Savepoint savepoint) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void releaseSavepoint(Savepoint savepoint) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) {
@@ -237,11 +238,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setClientInfo(String name, String value) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void setClientInfo(Properties properties) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public String getClientInfo(String name) {
@@ -249,7 +250,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public Properties getClientInfo() {
-		return null;
+		return new Properties();
 	}
 
 	@Override public Array createArrayOf(String typeName, Object[] elements) {
@@ -261,7 +262,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setSchema(String schema) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public String getSchema() {
@@ -269,11 +270,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void abort(Executor executor) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public void setNetworkTimeout(Executor executor, int milliseconds) {
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override public int getNetworkTimeout() {

@@ -9,7 +9,7 @@ import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 public abstract class AbstractReadableInfluxDbResultSet extends AbstractInfluxDbMultiResultSet {
 	protected final InfluxDbStatement statement;
 
-	public AbstractReadableInfluxDbResultSet(List<QueryResult.Result> results, InfluxDbStatement statement) {
+	protected AbstractReadableInfluxDbResultSet(List<QueryResult.Result> results, InfluxDbStatement statement) {
 		super(results);
 		this.statement = statement;
 		log = statement.getConnection().getMetaData().getDriver().getParentLogger();

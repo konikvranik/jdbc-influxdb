@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.logging.Logger;
 
 import org.influxdb.dto.QueryResult;
@@ -37,11 +37,11 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 	protected final String catalog;
 	protected final Logger log;
 
-	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
+	protected AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults) {
 		this(influxDbResultSet, columns, defaults, null, null);
 	}
 
-	public AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults,
+	protected AbstractProxyResultSet(InfluxDbResultSet influxDbResultSet, String[] columns, Object[] defaults,
 		String catalog, String schema) {
 		this.influxDbResultSet = influxDbResultSet;
 		this.columns = columns;
@@ -63,7 +63,7 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 		return index + 1;
 	}
 
-	protected Object mapOrDefault(int columnIndex, Function<Integer, Object> o) {
+	protected Object mapOrDefault(int columnIndex, IntFunction<Object> o) {
 		int indexToProxyTable = remapIndex(columnIndex);
 		if (indexToProxyTable <= 0 || indexToProxyTable > influxDbResultSet.getMetaData().getColumnCount()) {
 			return defaults[columnIndex - 1];

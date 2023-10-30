@@ -13,9 +13,18 @@ Intended to help developers and data analyst to inspect data over various GUI.
 
 CAUTION: This driver does *not* provide full JDBC functionality and compatibility.
 
-image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[build]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/codeql-analysis.yml/badge.svg[code QL]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle-publish.yml/badge.svg[release]
+image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[build]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/codeql-analysis.yml/badge.svg[code QL]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle-publish.yml/badge.svg[release] +
+link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=alert_status[Quality
+Gate
+Status]]link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=security_rating[Security
+Rating]]link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=sqale_rating[Maintainability
+Rating]]link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=reliability_rating[Reliability
+Rating]]link:https://sonarcloud.io/summary/new_code?id=konikvranik_jdbc-influxdb[image:https://sonarcloud.io/api/project_badges/measure?project=konikvranik_jdbc-influxdb&metric=sqale_index[Technical
+Debt]]
 
-[influxdb-jdbc artifact](https://central.sonatype.com/artifact/net.suteren.jdbc.influxdb/influxdb-jdbc) is hosted on [Maven Central](https://central.sonatype.com/)
+
+link:https://central.sonatype.com/artifact/net.suteren.jdbc.influxdb/influxdb-jdbc[influxdb-jdbc
+artifact] is hosted on https://central.sonatype.com/[Maven Central]
 
 
 [[supported]]

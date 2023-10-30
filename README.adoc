@@ -15,6 +15,9 @@ CAUTION: This driver does *not* provide full JDBC functionality and compatibilit
 
 image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle.yml/badge.svg[build]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/codeql-analysis.yml/badge.svg[code QL]{nbsp}image:https://github.com/konikvranik/jdbc-influxdb/actions/workflows/gradle-publish.yml/badge.svg[release]
 
+[influxdb-jdbc artifact](https://central.sonatype.com/artifact/net.suteren.jdbc.influxdb/influxdb-jdbc) is hosted on [Maven Central](https://central.sonatype.com/)
+
+
 [[supported]]
 == What _is_ supported
 

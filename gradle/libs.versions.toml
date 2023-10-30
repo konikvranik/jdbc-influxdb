@@ -8,7 +8,7 @@ org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.23"
 org-mockito-mockito-core = "org.mockito:mockito-core:5.4.0"
 org-projectlombok-lombok = "org.projectlombok:lombok:1.18.28"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.7"
-org-testcontainers-influxdb = "org.testcontainers:influxdb:1.18.3"
+org-testcontainers-influxdb = "org.testcontainers:influxdb:1.19.1"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.38.0"

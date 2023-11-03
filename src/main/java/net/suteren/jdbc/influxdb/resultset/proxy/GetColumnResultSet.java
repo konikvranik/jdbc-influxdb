@@ -22,11 +22,6 @@ public class GetColumnResultSet extends AbstractProxyResultSet {
 				null, null, null, null, true, null, null, Types.VARCHAR, null, null, null }, catalog, null);
 	}
 
-	private static String getWithClause(String tableNamePattern) {
-		return tableNamePattern != null && !tableNamePattern.isBlank() ?
-			String.format(" FROM \"%s\"", tableNamePattern) : "";
-	}
-
 	@Override protected int remapIndex(int columnIndex) {
 		switch (columnIndex) {
 		case 4:

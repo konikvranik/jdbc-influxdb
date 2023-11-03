@@ -1,12 +1,12 @@
 = InfluxDB image:.resources/jdbc.png?[50,60] driver
 :project-version: 0.2.2
 :uri-InfluxQL: https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/
-:uri-packages: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version={project-version}
+:uri-packages: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version={release-version}
 :project-uri: https://github.com/konikvranik/jdbc-influxdb
 :issues-uri: {project-uri}/issues/
 :icons: font
 konikvranik <hpa@suteren.net>
-v{project-version}, 2022-09-27
+v{release-version}, 2022-09-27
 
 Basic JDBC query functionality for the InfluxDB. +
 Intended to help developers and data analyst to inspect data over various GUI.
@@ -55,7 +55,7 @@ InfluxDB doesn't support modify operations.
 
 == How to use it
 
-Get the driver from the GitHub repo: {uri-packages}[influxdb-jdbc-{project-version}]
+Get the driver from the GitHub repo: {uri-packages}[influxdb-jdbc-{release-version}]
 
 For <<maven>> and <<gradle>> see related sections below.
 
@@ -92,7 +92,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.suteren.jdbc.influxdb:influxdb-jdbc:{project-version}'
+    implementation 'net.suteren.jdbc.influxdb:influxdb-jdbc:{release-version}'
 }
 ----
 
@@ -146,6 +146,6 @@ dependencies {
 <dependency>
   <groupId>net.suteren.jdbc.influxdb</groupId>
   <artifactId>influxdb-jdbc</artifactId>
-  <version>{project-version}</version>
+  <version>{release-version}</version>
 </dependency>
 ----

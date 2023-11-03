@@ -10,7 +10,7 @@ public class InfluxDbConnectionTest {
 	private InfluxDbConnection connection;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		connection = new InfluxDbConnection("http://localhost:8086", "user", "password", "database", new InfluxDbDriver());
 	}
 
@@ -20,6 +20,7 @@ public class InfluxDbConnectionTest {
 		assertEquals("SELECT * from \\\"measure\\\"", connection.nativeSQL("SELECT * from \\\"measure\\\""));
 
 		assertEquals("SELECT * from \\\"measure\\\"", connection.nativeSQL("SELECT * from \"\"measure\"\""));
+		assertEquals("SELECT * from \"\\\"measure\\\"\"", connection.nativeSQL("SELECT * from \"\"\"measure\"\"\""));
 
 		assertEquals("SELECT * FROM measure", connection.nativeSQL("SELECT * from test.measure"));
 	}

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +35,6 @@ public class InfluxDbConnection implements Connection {
 	private final InfluxDbMetadata influxDbMetadata;
 	private boolean isClosed;
 	private final Logger log;
-	public static final Pattern SANITIZE_ESCAPING_PATTERN = Pattern.compile("\"\"(?!\")");
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
 		Pattern.compile("^\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
@@ -92,8 +93,44 @@ public class InfluxDbConnection implements Connection {
 		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
 			sql = sql.replaceAll("\\s+\"?default\"?\\.", " ");
 		}
-		sql = SANITIZE_ESCAPING_PATTERN.matcher(sql).replaceAll("\\\\\"");
+		sql = convertSqlQuoting(sql);
 		return sql;
+	}
+
+	private String convertSqlQuoting(String sql) {
+		char[] chars = sql.toCharArray();
+		StringBuilder result = new StringBuilder();
+		AtomicInteger counter = new AtomicInteger(0);
+		AtomicBoolean order = new AtomicBoolean(false);
+		AtomicBoolean escape = new AtomicBoolean(false);
+		for (char ch : chars) {
+			escape.set(false);
+			if (ch == '"' && !escape.get()) {
+				counter.incrementAndGet();
+				escape.set(false);
+			} else {
+				handleQuotes(result, counter, order);
+				result.append(ch);
+				escape.set(ch == '\\');
+			}
+		}
+		handleQuotes(result, counter, order);
+		return result.toString();
+	}
+
+	private void handleQuotes(StringBuilder result, AtomicInteger counter, AtomicBoolean order) {
+		if (counter.get() > 0) {
+			boolean odd = counter.get() % 2 != 0;
+			boolean b = order.getAndSet(!order.get());
+			if (odd && !b) {
+				result.append("\"");
+			}
+			result.append("\\\"".repeat(counter.get() / 2));
+			if (odd && b) {
+				result.append("\"");
+			}
+			counter.set(0);
+		}
 	}
 
 	@Override public void setAutoCommit(boolean autoCommit) {

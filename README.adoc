@@ -1,5 +1,5 @@
 = InfluxDB image:.resources/jdbc.png?[50,60] driver
-:project-version: 0.2.2
+:release-version: 0.2.2
 :uri-InfluxQL: https://docs.influxdata.com/influxdb/v1.7/query_language/data_exploration/
 :uri-packages: https://github.com/konikvranik/jdbc-influxdb/packages/1650633?version={release-version}
 :project-uri: https://github.com/konikvranik/jdbc-influxdb

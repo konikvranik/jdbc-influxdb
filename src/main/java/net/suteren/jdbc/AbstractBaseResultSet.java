@@ -22,9 +22,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractBaseResultSet implements ResultSet {
-	protected static String getWithClause(String tableNamePattern) {
-		return StringUtils.isNotBlank(tableNamePattern) ? String.format(" FROM \"%s\"", quoteName(tableNamePattern)) : "";
-	}
 
 	public String getString(String columnLabel) throws SQLException {
 		return getString(findColumn(columnLabel));
@@ -336,5 +333,9 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 
 	protected static String quoteName(String tableNamePattern) {
 		return tableNamePattern.replace("\"", "\\\"");
+	}
+
+	protected static String getWithClause(String tableNamePattern) {
+		return StringUtils.isNotBlank(tableNamePattern) ? String.format(" FROM \"%s\"", quoteName(tableNamePattern)) : "";
 	}
 }

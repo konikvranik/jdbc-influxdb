@@ -7,7 +7,6 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 import org.influxdb.InfluxDB;
-import org.jetbrains.annotations.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -107,7 +106,7 @@ public abstract class AbstractInfluxDbStatement implements Statement {
 		return execute(sql, getColumnIndexes(columnNames));
 	}
 
-	@NotNull private int[] getColumnIndexes(String[] columnNames) throws SQLException {
+	private int[] getColumnIndexes(String[] columnNames) throws SQLException {
 		int[] columnIndexes = new int[columnNames.length];
 		for (int i = 0; i < columnNames.length; i++) {
 			columnIndexes[i] = resultSet.findColumn(columnNames[i]);

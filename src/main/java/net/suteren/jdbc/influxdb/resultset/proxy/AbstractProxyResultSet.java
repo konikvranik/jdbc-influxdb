@@ -213,7 +213,7 @@ public abstract class AbstractProxyResultSet extends AbstractTypeMappingResultSe
 	}
 
 	protected static String databaseRestriction(String catalog) {
-		return catalog != null && !catalog.isBlank() ? String.format(" ON %s", catalog) : "";
+		return catalog != null && !catalog.isBlank() ? String.format(" ON \"%s\"", quoteName(catalog)) : "";
 	}
 
 	protected abstract int remapIndex(int columnIndex);

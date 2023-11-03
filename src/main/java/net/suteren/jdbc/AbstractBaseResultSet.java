@@ -19,7 +19,10 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 public abstract class AbstractBaseResultSet implements ResultSet {
+
 	public String getString(String columnLabel) throws SQLException {
 		return getString(findColumn(columnLabel));
 	}
@@ -326,5 +329,13 @@ public abstract class AbstractBaseResultSet implements ResultSet {
 
 	@Override public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
 		return getObject(findColumn(columnLabel), type);
+	}
+
+	protected static String quoteName(String tableNamePattern) {
+		return tableNamePattern.replace("\"", "\\\"");
+	}
+
+	protected static String getWithClause(String tableNamePattern) {
+		return StringUtils.isNotBlank(tableNamePattern) ? String.format(" FROM \"%s\"", quoteName(tableNamePattern)) : "";
 	}
 }

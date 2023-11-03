@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +39,10 @@ public class InfluxDbConnection implements Connection {
 		Pattern.compile("^\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
 		Pattern.compile("^\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?(['\"]?)(\\S+)\\3(\\s.*)?$",
+			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
+		Pattern.compile("^\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\.(\\S+(?:\\s.*)?)$",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
@@ -75,22 +81,66 @@ public class InfluxDbConnection implements Connection {
 		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
 			String alias = matcher.group(4);
-			sql = matcher.replaceFirst("select $1 from $2$5");
-			sql = sql.replaceAll(String.format("\\s+%s\\.", alias), " ")
+			sql = matcher.replaceFirst("SELECT $1 FROM $2$5")
+				.replaceAll(String.format("\\s+%s\\.", alias), " ")
 				.replaceAll(String.format("\\s+\"%s\"\\.", alias), " ");
 		}
+		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
+		if (matcher.matches()) {
+			sql = matcher.replaceFirst("SELECT $1 FROM $3");
+		}
+
 		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
 			sql = sql.replaceAll("\\s+\"?default\"?\\.", " ");
 		}
+		sql = convertSqlQuoting(sql);
 		return sql;
 	}
 
+	private String convertSqlQuoting(String sql) {
+		char[] chars = sql.toCharArray();
+		StringBuilder result = new StringBuilder();
+		AtomicInteger counter = new AtomicInteger(0);
+		AtomicBoolean order = new AtomicBoolean(false);
+		AtomicBoolean escape = new AtomicBoolean(false);
+		for (char ch : chars) {
+			escape.set(false);
+			if (ch == '"' && !escape.get()) {
+				counter.incrementAndGet();
+				escape.set(false);
+			} else {
+				handleQuotes(result, counter, order);
+				result.append(ch);
+				escape.set(ch == '\\');
+			}
+		}
+		handleQuotes(result, counter, order);
+		return result.toString();
+	}
+
+	private void handleQuotes(StringBuilder result, AtomicInteger counter, AtomicBoolean order) {
+		if (counter.get() > 0) {
+			boolean odd = counter.get() % 2 != 0;
+			boolean b = order.getAndSet(!order.get());
+			if (odd && !b) {
+				result.append("\"");
+			}
+			result.append("\\\"".repeat(counter.get() / 2));
+			if (odd && b) {
+				result.append("\"");
+			}
+			counter.set(0);
+		}
+	}
+
 	@Override public void setAutoCommit(boolean autoCommit) {
-		throw new UnsupportedOperationException();
+		if (!autoCommit) {
+			throw new UnsupportedOperationException("Transactions are not supported. Autocommit must be true.");
+		}
 	}
 
 	@Override public boolean getAutoCommit() {
-		return false;
+		return true;
 	}
 
 	@Override public void commit() {
@@ -98,7 +148,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void rollback() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Transactions are not supported. Can not rollback.");
 	}
 
 	@Override public void close() {
@@ -115,7 +165,9 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setReadOnly(boolean readOnly) {
-		throw new UnsupportedOperationException();
+		if (!readOnly) {
+			throw new UnsupportedOperationException("Currently only readonly access to the InfluxDB is supported.");
+		}
 	}
 
 	@Override public boolean isReadOnly() {
@@ -123,7 +175,9 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setCatalog(String catalog) {
-		throw new UnsupportedOperationException();
+		if (catalog != null) {
+			throw new UnsupportedOperationException(String.format("Catalog %s can not be set", catalog));
+		}
 	}
 
 	@Override public String getCatalog() {
@@ -131,11 +185,13 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setTransactionIsolation(int level) {
-		throw new UnsupportedOperationException();
+		if (level != TRANSACTION_NONE) {
+			throw new UnsupportedOperationException("Transactions are not supported. Can set transaction isolation.");
+		}
 	}
 
 	@Override public int getTransactionIsolation() {
-		return Connection.TRANSACTION_NONE;
+		return TRANSACTION_NONE;
 	}
 
 	@Override public SQLWarning getWarnings() {
@@ -143,7 +199,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void clearWarnings() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Clear warning is not supported.");
 	}
 
 	@Override public Statement createStatement(int resultSetType, int resultSetConcurrency) {
@@ -163,11 +219,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setTypeMap(Map<String, Class<?>> map) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Type maps are not supported.");
 	}
 
 	@Override public void setHoldability(int holdability) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Result set holdability is not supported.");
 	}
 
 	@Override public int getHoldability() {
@@ -183,11 +239,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void rollback(Savepoint savepoint) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Transactions are not supported. Can not rollback.");
 	}
 
 	@Override public void releaseSavepoint(Savepoint savepoint) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Transactions are not supported. Savepoint can not be released.");
 	}
 
 	@Override public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) {
@@ -238,11 +294,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setClientInfo(String name, String value) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Client info is not supported.");
 	}
 
 	@Override public void setClientInfo(Properties properties) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Client info is not supported.");
 	}
 
 	@Override public String getClientInfo(String name) {
@@ -262,7 +318,7 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setSchema(String schema) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Set schema is not supported.");
 	}
 
 	@Override public String getSchema() {
@@ -270,11 +326,11 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void abort(Executor executor) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Aborting is not supported.");
 	}
 
 	@Override public void setNetworkTimeout(Executor executor, int milliseconds) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Network timeout is not supported.");
 	}
 
 	@Override public int getNetworkTimeout() {

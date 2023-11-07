@@ -7,7 +7,7 @@ org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.21.
 org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.23"
 org-mockito-mockito-core = "org.mockito:mockito-core:5.7.0"
 org-projectlombok-lombok = "org.projectlombok:lombok:1.18.30"
-org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.7"
+org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.9"
 org-testcontainers-influxdb = "org.testcontainers:influxdb:1.19.1"
 
 [plugins]

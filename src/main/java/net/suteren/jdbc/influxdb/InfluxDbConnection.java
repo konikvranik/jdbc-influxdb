@@ -38,11 +38,11 @@ public class InfluxDbConnection implements Connection {
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
 		Pattern.compile("\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+as\\s+(['\"]?)(\\S+)\\3(\\s.*)",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+(?!where)(?:as\\s+)?((['\"]?)(\\S+)\\4)(.*)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\.(\\S+(?:\\s.*)?)",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(([\"']?)\\S+\\3)\\.(([\"']?)\\S+\\5(?:\\s.*)?)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
@@ -80,14 +80,14 @@ public class InfluxDbConnection implements Connection {
 		}
 		Matcher matcher = TABLE_ALIASES_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			String alias = matcher.group(4);
-			sql = matcher.replaceFirst("SELECT $1 FROM $2$5")
+			String alias = matcher.group(5);
+			sql = matcher.replaceFirst("SELECT $1 FROM $2$6")
 				.replaceAll(String.format("\\s+%s\\.", alias), " ")
 				.replaceAll(String.format("\\s+\"%s\"\\.", alias), " ");
 		}
 		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			sql = matcher.replaceFirst("SELECT $1 FROM $3");
+			sql = matcher.replaceFirst("SELECT $1 FROM $4");
 		}
 
 		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {

@@ -20,14 +20,16 @@ public class InfluxDbConnectionTest {
 
 	public static Stream<Arguments> sqlSamples() {
 		return Stream.of(
-			Arguments.arguments("SELECT * from measure", "SELECT * from measure"),
-			Arguments.arguments("SELECT * from \"measure\"", "SELECT * from \"measure\""),
-			Arguments.arguments("SELECT * from \\\"measure\\\"", "SELECT * from \\\"measure\\\""),
-			Arguments.arguments("SELECT * from \\\"measure\\\"", "SELECT * from \"\"measure\"\""),
-			Arguments.arguments("SELECT * from \"\\\"measure\\\"\"", "SELECT * from \"\"\"measure\"\"\""),
-			Arguments.arguments("SELECT * FROM measure", "SELECT * from test.measure"),
-			Arguments.arguments("SELECT * FROM jmeter where timestamp > now() - \"1 day\"", "select * from jmeter.jmeter where timestamp > now() - \"1 day\"")
-
+			Arguments.arguments("select * from measure", "select * from measure"),
+			Arguments.arguments("select * from \"measure\"", "select * from \"measure\""),
+			Arguments.arguments("select * from \\\"measure\\\"", "select * from \\\"measure\\\""),
+			Arguments.arguments("select * from \\\"measure\\\"", "select * from \"\"measure\"\""),
+			Arguments.arguments("select * from \"\\\"measure\\\"\"", "select * from \"\"\"measure\"\"\""),
+			Arguments.arguments("SELECT * FROM measure", "select * from test.measure"),
+			Arguments.arguments("SELECT * FROM jmeter where timestamp > now() - \"1 day\"", "select * from jmeter.jmeter where timestamp > now() - \"1 day\""),
+			Arguments.arguments("SELECT * FROM jmeter\nwhere timestamp > now() - \"2 days\"",
+				"select t.*\nfrom jmeter.jmeter t\nwhere timestamp > now() - \"2 days\""),
+			Arguments.arguments("SELECT * FROM jmeter","select t.*\nfrom jmeter.jmeter t")
 		);
 	}
 

@@ -36,17 +36,17 @@ public class InfluxDbConnection implements Connection {
 	private boolean isClosed;
 	private final Logger log;
 	private static final Pattern KEEP_ALIVE_SQL_PATTERN =
-		Pattern.compile("^\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		Pattern.compile("\\s*SELECT\\s+['\"]keep\\s+alive['\"]\\s*.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 	private static final Pattern TABLE_ALIASES_SQL_PATTERN =
-		Pattern.compile("^\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)?(['\"]?)(\\S+)\\3(\\s.*)?$",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\s+(?:as\\s+)(['\"]?)(\\S+)\\3(\\s.*)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
-		Pattern.compile("^\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\.(\\S+(?:\\s.*)?)$",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(\\S+)\\.(\\S+(?:\\s.*)?)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
-		Pattern.compile("^\\s*SELECT\\s+(?:\"?default\"?\\.(\\S+)(?:\\s*,\\s*)?)+\\s+FROM\\s+.+$",
+		Pattern.compile("\\s*SELECT\\s+(?:\"?default\"?\\.(\\S+)(?:\\s*,\\s*)?)+\\s+FROM\\s+.+",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	public InfluxDbConnection(String url, String username, String password, String database,

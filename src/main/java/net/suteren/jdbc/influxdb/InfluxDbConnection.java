@@ -43,7 +43,7 @@ public class InfluxDbConnection implements Connection {
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(([\"']?)\\S+\\3)\\.(([\"']?)\\S+\\5(?:\\s.*)?)",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(([\"']?)(\\S+)\\3)\\.(([\"']?)(\\S+)\\6(\\s.*)?)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
@@ -90,12 +90,12 @@ public class InfluxDbConnection implements Connection {
 		}
 		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			sql = matcher.replaceFirst("SELECT $1 FROM $4");
+			sql = matcher.replaceFirst("SELECT $1 FROM \"$4\"..\"$7\"$8");
 		}
 
-		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
-			sql = sql.replaceAll("(\\s,)([\"']?)default\\2\\.", "$1");
-		}
+//		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
+//			sql = sql.replaceAll("(\\s,)([\"']?)default\\2\\.", "$1");
+//		}
 		sql = convertSqlQuoting(sql);
 		return sql;
 	}

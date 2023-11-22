@@ -26,6 +26,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 
+import lombok.Getter;
 import net.suteren.jdbc.influxdb.statement.InfluxDbPreparedStatement;
 import net.suteren.jdbc.influxdb.statement.InfluxDbStatement;
 
@@ -48,6 +49,8 @@ public class InfluxDbConnection implements Connection {
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
 		Pattern.compile("\\s*SELECT\\s.*(['\"]?)default\\1\\..*\\sFROM\\s+.+",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	@Getter private String catalog;
+	@Getter private String schema;
 
 	public InfluxDbConnection(String url, String username, String password, String database,
 		InfluxDbDriver influxDbDriver) {
@@ -176,12 +179,9 @@ public class InfluxDbConnection implements Connection {
 
 	@Override public void setCatalog(String catalog) {
 		if (catalog != null) {
-			throw new UnsupportedOperationException(String.format("Catalog %s can not be set", catalog));
+			influxDbClient.setDatabase(catalog);
+			this.catalog = catalog;
 		}
-	}
-
-	@Override public String getCatalog() {
-		return null;
 	}
 
 	@Override public void setTransactionIsolation(int level) {
@@ -318,11 +318,8 @@ public class InfluxDbConnection implements Connection {
 	}
 
 	@Override public void setSchema(String schema) {
-		throw new UnsupportedOperationException("Set schema is not supported.");
-	}
-
-	@Override public String getSchema() {
-		return null;
+		influxDbClient.setRetentionPolicy(schema);
+		this.schema = schema;
 	}
 
 	@Override public void abort(Executor executor) {

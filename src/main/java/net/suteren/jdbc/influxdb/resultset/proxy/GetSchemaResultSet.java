@@ -1,9 +1,10 @@
 package net.suteren.jdbc.influxdb.resultset.proxy;
 
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.suteren.jdbc.influxdb.InfluxDbConnection;
 import net.suteren.jdbc.influxdb.resultset.InfluxDbResultSet;
@@ -18,16 +19,13 @@ public class GetSchemaResultSet extends AbstractProxyResultSet {
 
 	private static InfluxDbResultSet prepareResults(InfluxDbConnection influxDbConnection, String catalog)
 		throws SQLException {
-		InfluxDbResultSet showDatabases = influxDbConnection.createStatement().executeQuery("SHOW DATABASES");
-		if (catalog != null) {
-			showDatabases.getResults().forEach(r ->
-				r.getSeries().forEach(s ->
-					s.setValues(s.getValues().stream()
-						.filter(v -> Objects.equals(catalog, v.get(0)))
-						.collect(Collectors.toList())))
-			);
-		}
-		return showDatabases;
+		InfluxDbResultSet retentionPolicies = influxDbConnection.createStatement()
+			.executeQuery(String.format("SHOW RETENTION POLICIES%s", StringUtils.isNotBlank(catalog) ? " ON " + catalog : ""));
+		retentionPolicies.getResults().forEach(r ->
+			r.getSeries().forEach(s ->
+				s.setValues(new ArrayList<>(s.getValues())))
+		);
+		return retentionPolicies;
 	}
 
 	@Override protected int remapIndex(int columnIndex) {

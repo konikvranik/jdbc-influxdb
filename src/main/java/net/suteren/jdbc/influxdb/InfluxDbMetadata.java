@@ -134,7 +134,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getSQLKeywords() {
-		return "measurement,field,tag,series";
+		return "measurement,field,tag,series,select,database";
 	}
 
 	@Override public String getNumericFunctions() {
@@ -292,7 +292,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getSchemaTerm() {
-		return "";
+		return "retention";
 	}
 
 	@Override public String getProcedureTerm() {
@@ -312,43 +312,43 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public boolean supportsSchemasInDataManipulation() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsSchemasInProcedureCalls() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsSchemasInTableDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsSchemasInIndexDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsSchemasInPrivilegeDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsCatalogsInDataManipulation() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsCatalogsInProcedureCalls() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsCatalogsInTableDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsCatalogsInIndexDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsCatalogsInPrivilegeDefinitions() {
-		return false;
+		return true;
 	}
 
 	@Override public boolean supportsPositionedDelete() {

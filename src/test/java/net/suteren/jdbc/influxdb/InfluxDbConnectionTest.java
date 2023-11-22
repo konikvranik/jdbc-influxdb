@@ -29,7 +29,7 @@ public class InfluxDbConnectionTest {
 			Arguments.arguments("SELECT * FROM jmeter where timestamp > now() - \"1 day\"", "select * from jmeter.jmeter where timestamp > now() - \"1 day\""),
 			Arguments.arguments("SELECT * FROM jmeter\nwhere timestamp > now() - \"2 days\"",
 				"select t.*\nfrom jmeter.jmeter t\nwhere timestamp > now() - \"2 days\""),
-			Arguments.arguments("SELECT * FROM jmeter","select t.*\nfrom jmeter.jmeter t"),
+			Arguments.arguments("SELECT * FROM jmeter", "select t.*\nfrom jmeter.jmeter t"),
 			Arguments.arguments("SELECT * FROM \"_internal\".cq", "SELECT t.*\n  FROM \"_internal\".cq t")
 		);
 	}

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
@@ -43,7 +44,7 @@ public class InfluxDbConnection implements Connection {
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(([\"']?)(\\S+)\\3)\\.(([\"']?)(\\S+)\\6(\\s.*)?)",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(?:(?:(([\"']?)(\\S+)\\3)\\.)?(([\"']?)(\\S+)\\6)\\.)?(([\"']?)(\\S+)\\9(\\s.*)?)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
@@ -90,12 +91,20 @@ public class InfluxDbConnection implements Connection {
 		}
 		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
 		if (matcher.matches()) {
-			sql = matcher.replaceFirst("SELECT $1 FROM \"$4\"..\"$7\"$8");
+			if (StringUtils.isNotBlank(matcher.group(4))) {
+				if (StringUtils.isNotBlank(matcher.group(7))) {
+					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$7\".\"$10\"$11");
+				} else {
+					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$10\"$11");
+				}
+			} else {
+				sql = matcher.replaceFirst("SELECT $1 FROM \"$10\"$11");
+			}
 		}
 
-//		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
-//			sql = sql.replaceAll("(\\s,)([\"']?)default\\2\\.", "$1");
-//		}
+		//		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
+		//			sql = sql.replaceAll("(\\s,)([\"']?)default\\2\\.", "$1");
+		//		}
 		sql = convertSqlQuoting(sql);
 		return sql;
 	}

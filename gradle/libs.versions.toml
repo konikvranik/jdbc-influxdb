@@ -1,7 +1,7 @@
 [libraries]
 ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.4.11"
 org-apache-commons-commons-collections4 = "org.apache.commons:commons-collections4:4.4"
-org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.13.0"
+org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.14.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:3.0.0-alpha1"
 org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.23"
 org-junit-jupiter-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "org-junit-jupiter" }

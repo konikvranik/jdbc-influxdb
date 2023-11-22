@@ -44,7 +44,7 @@ public class InfluxDbConnection implements Connection {
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern TABLE_SCHEMA_SQL_PATTERN =
-		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(?:(?:(([\"']?)(\\S+)\\3)\\.)?(([\"']?)(\\S+)\\6)\\.)?(([\"']?)(\\S+)\\9(\\s.*)?)",
+		Pattern.compile("\\s*SELECT\\s+(\\S+)\\s+FROM\\s+(?:(?:(((?:(?<!\\\\)[\"'])?)(\\S+)\\3)\\.)?(((?:(?<!\\\\)[\"'])?)(\\S+)\\6)\\.)?(((?:(?<!\\\\)[\"'])?)(\\S+)\\9(\\s.*)?)",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private static final Pattern DEFAULT_SCHEMA_PATTERN =
@@ -89,18 +89,18 @@ public class InfluxDbConnection implements Connection {
 				.replaceAll(String.format("\\s+%s\\.", alias), " ")
 				.replaceAll(String.format("\\s+\"%s\"\\.", alias), " ");
 		}
-		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
-		if (matcher.matches()) {
-			if (StringUtils.isNotBlank(matcher.group(4))) {
-				if (StringUtils.isNotBlank(matcher.group(7))) {
-					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$7\".\"$10\"$11");
-				} else {
-					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$10\"$11");
-				}
-			} else {
-				sql = matcher.replaceFirst("SELECT $1 FROM \"$10\"$11");
-			}
-		}
+//		matcher = TABLE_SCHEMA_SQL_PATTERN.matcher(sql);
+//		if (matcher.matches()) {
+//			if (StringUtils.isNotBlank(matcher.group(4))) {
+//				if (StringUtils.isNotBlank(matcher.group(7))) {
+//					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$7\".\"$10\"$11");
+//				} else {
+//					sql = matcher.replaceFirst("SELECT $1 FROM \"$4\".\"$10\"$11");
+//				}
+//			} else {
+//				sql = matcher.replaceFirst("SELECT $1 FROM \"$10\"$11");
+//			}
+//		}
 
 		//		if (DEFAULT_SCHEMA_PATTERN.matcher(sql).matches()) {
 		//			sql = sql.replaceAll("(\\s,)([\"']?)default\\2\\.", "$1");

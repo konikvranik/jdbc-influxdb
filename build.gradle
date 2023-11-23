@@ -50,10 +50,6 @@ jacocoTestReport {
 	}
 }
 
-repositories {
-	mavenCentral()
-}
-
 javadoc {
 	inputs.property('moduleName', moduleName)
 	doFirst {

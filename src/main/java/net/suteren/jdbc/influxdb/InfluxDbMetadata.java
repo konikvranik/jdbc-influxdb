@@ -7,6 +7,7 @@ import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
+import net.suteren.jdbc.Version;
 import net.suteren.jdbc.influxdb.resultset.proxy.AbstractProxyResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetCatalogResultSet;
 import net.suteren.jdbc.influxdb.resultset.proxy.GetColumnResultSet;
@@ -78,7 +79,7 @@ public class InfluxDbMetadata implements DatabaseMetaData {
 	}
 
 	@Override public String getDriverVersion() {
-		return "0.1.0";
+		return Version.getVersion().toString();
 	}
 
 	@Override public int getDriverMajorVersion() {

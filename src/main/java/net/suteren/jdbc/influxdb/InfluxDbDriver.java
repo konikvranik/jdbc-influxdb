@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import net.suteren.jdbc.Version;
 
 @Log
 public class InfluxDbDriver implements java.sql.Driver {
@@ -79,8 +80,8 @@ public class InfluxDbDriver implements java.sql.Driver {
 	@Override public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) {
 		Set<DriverPropertyInfo> propertyInfos = new HashSet<>();
 		info.putAll(parseUrlParams(url));
-		if (StringUtils.isBlank(info.getProperty(DATABASE_PROPERTY,info.getProperty(DB_PROPERTY)))) {
-			propertyInfos.add(makePropertyInfo(DATABASE_PROPERTY, info.getProperty(DATABASE_PROPERTY,info.getProperty(DB_PROPERTY)), true, "Database name"));
+		if (StringUtils.isBlank(info.getProperty(DATABASE_PROPERTY, info.getProperty(DB_PROPERTY)))) {
+			propertyInfos.add(makePropertyInfo(DATABASE_PROPERTY, info.getProperty(DATABASE_PROPERTY, info.getProperty(DB_PROPERTY)), true, "Database name"));
 		}
 		if (StringUtils.isBlank(info.getProperty(USERNAME_PROPERTY)) && StringUtils.isBlank(info.getProperty(
 			USER_PROPERTY))) {
@@ -101,11 +102,11 @@ public class InfluxDbDriver implements java.sql.Driver {
 	}
 
 	@Override public int getMajorVersion() {
-		return 1;
+		return Version.getVersion().getMajor();
 	}
 
 	@Override public int getMinorVersion() {
-		return 0;
+		return Version.getVersion().getMajor();
 	}
 
 	@Override public boolean jdbcCompliant() {

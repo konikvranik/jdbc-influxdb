@@ -11,6 +11,7 @@ dependencies {
 	implementation libs.org.influxdb.influxdb.java
 	implementation libs.org.apache.commons.commons.lang3
 	implementation libs.org.slf4j.slf4j.api
+	implementation libs.com.vdurmont.semver4j
 
 	testImplementation libs.org.testcontainers.influxdb
 	testImplementation libs.ch.qos.logback.logback.classic
@@ -71,6 +72,12 @@ jar {
 		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
+
+tasks.processResources.finalizedBy tasks.register('applicationVersion') {
+	doFirst {
+		new File(sourceSets.main.output.resourcesDir, 'version.properties').write "version=${version}\n"
+	}
 }
 
 publishing {

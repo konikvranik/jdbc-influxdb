@@ -4,7 +4,7 @@ com-vdurmont-semver4j = "com.vdurmont:semver4j:3.1.0"
 org-apache-commons-commons-collections4 = "org.apache.commons:commons-collections4:4.4"
 org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.14.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:3.0.0-alpha1"
-org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.23"
+org-influxdb-influxdb-java = "org.influxdb:influxdb-java:2.24"
 org-junit-jupiter-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "org-junit-jupiter" }
 org-junit-jupiter-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "org-junit-jupiter" }
 org-mockito-mockito-core = "org.mockito:mockito-core:5.8.0"

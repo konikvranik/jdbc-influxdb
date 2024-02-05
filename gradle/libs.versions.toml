@@ -18,4 +18,4 @@ io-freefair-lombok = "io.freefair.lombok:8.4"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.3"
 
 [versions]
-org-junit-jupiter = "5.10.1"
+org-junit-jupiter = "5.10.2"

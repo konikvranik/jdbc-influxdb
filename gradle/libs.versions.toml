@@ -1,5 +1,5 @@
 [libraries]
-ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.5.1"
+ch-qos-logback-logback-classic = "ch.qos.logback:logback-classic:1.5.3"
 com-vdurmont-semver4j = "com.vdurmont:semver4j:3.1.0"
 org-apache-commons-commons-collections4 = "org.apache.commons:commons-collections4:4.4"
 org-apache-commons-commons-lang3 = "org.apache.commons:commons-lang3:3.14.0"

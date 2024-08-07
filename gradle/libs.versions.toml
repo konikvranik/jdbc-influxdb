@@ -9,7 +9,7 @@ org-junit-jupiter-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jup
 org-junit-jupiter-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "org-junit-jupiter" }
 org-mockito-mockito-core = "org.mockito:mockito-core:5.12.0"
 org-projectlombok-lombok = "org.projectlombok:lombok:1.18.34"
-org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.13"
+org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.14"
 org-testcontainers-influxdb = "org.testcontainers:influxdb:1.20.1"
 
 [plugins]

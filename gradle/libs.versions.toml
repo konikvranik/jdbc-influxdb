@@ -10,7 +10,7 @@ org-junit-jupiter-junit-jupiter-params = { module = "org.junit.jupiter:junit-jup
 org-mockito-mockito-core = "org.mockito:mockito-core:5.14.2"
 org-projectlombok-lombok = "org.projectlombok:lombok:1.18.36"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.16"
-org-testcontainers-influxdb = "org.testcontainers:influxdb:1.20.3"
+org-testcontainers-influxdb = "org.testcontainers:influxdb:1.20.4"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
